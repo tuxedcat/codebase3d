@@ -1,22 +1,24 @@
 #include "GL/glut.h"
 #include <cmath>
+#include <iostream>
 #include "GLFW/glfw3.h"
 #include "game/Entity.h"
 #include "game/Mesh.h"
 #include "render/impl/ogl/RendererOGL.h"
+#include <unistd.h>
 
 using namespace std;
 
 Entity* entity_root;
+Vec3 tmp(-3,0,0);
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glTranslatef(0,0,-10); //temporal camera transform code
-
 	vector<RenderRequest> render_q;
+	entity_root->position(tmp=tmp.rotate({0,1,0},0.01f));
 	entity_root->draw(Mat44::identity(), render_q);
 	RendererOGL().render(render_q);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include "common/Quaternion.h"
 
 class Vec3{
 public:
@@ -23,4 +24,15 @@ public:
 	float len(const Vec3& o)const{ return sqrtf(this->dot(*this)); }
 	float dot(const Vec3& o)const{ return x*o.x+y*o.y+z*o.z; }
 	Vec3 cross(const Vec3& o)const{ throw "Unimplemented"; }
+	Vec3 rotate(const Vec3& axis, float angle)const{
+		auto sin_ha = sin(angle/2);
+		auto cos_ha = cos(angle/2);
+		auto qaxis = Quaternion(cos_ha, axis.x*sin_ha, axis.y*sin_ha, axis.z*sin_ha).normalized();
+		auto qvec = Quaternion(0,x,y,z);
+		auto res = qaxis*qvec*qaxis.conjugate();
+		return {res.x,res.y,res.z};
+	}
 };
+
+#include <ostream>
+std::ostream& operator<<(std::ostream& os, const Vec3& vec);
