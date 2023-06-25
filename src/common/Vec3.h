@@ -21,10 +21,11 @@ public:
 	Vec3 operator*(float w)const{ return {x*w, y*w, z*w}; }
 	Vec3 operator/(float w)const{ return {x/w, y/w, z/w}; }
 
-	float len(const Vec3& o)const{ return sqrtf(this->dot(*this)); }
+	float len()const{ return sqrtf(lensq()); }
+	float lensq()const{ return this->dot(*this); }
 	float dot(const Vec3& o)const{ return x*o.x+y*o.y+z*o.z; }
 	Vec3 cross(const Vec3& o)const{ throw "Unimplemented"; }
-	Vec3 rotate(const Vec3& axis, float angle)const{
+	Vec3 rotated(const Vec3& axis, float angle)const{
 		auto sin_ha = sin(angle/2);
 		auto cos_ha = cos(angle/2);
 		auto qaxis = Quaternion(cos_ha, axis.x*sin_ha, axis.y*sin_ha, axis.z*sin_ha).normalized();
@@ -32,6 +33,7 @@ public:
 		auto res = qaxis*qvec*qaxis.conjugate();
 		return {res.x,res.y,res.z};
 	}
+	bool isOrtho(const Vec3& o)const{ return fabs(this->dot(o))<eps; }
 };
 
 #include <ostream>

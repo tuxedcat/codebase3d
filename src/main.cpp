@@ -18,7 +18,7 @@ void display(){
 	glLoadIdentity();
 
 	vector<RenderRequest> render_q;
-	entity_root->position(tmp=tmp.rotate({0,1,0},0.01f));
+	entity_root->position(tmp=tmp.rotated({0,1,0},0.01f));
 	entity_root->draw(Mat44::identity(), render_q);
 	RendererOGL().render(render_q);
 }
