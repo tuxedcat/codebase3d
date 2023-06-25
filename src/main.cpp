@@ -10,7 +10,6 @@
 using namespace std;
 
 Entity* entity_root;
-Vec3 tmp(-3,0,0);
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -18,7 +17,9 @@ void display(){
 	glLoadIdentity();
 
 	vector<RenderRequest> render_q;
-	entity_root->position(tmp=tmp.rotated({0,1,0},0.01f));
+	// static Vec3 tmp(-3,0,0);
+	// entity_root->position(tmp=tmp.rotated({0,1,0},0.01f));
+	entity_root->rotate({0,1,0},0.01f);
 	entity_root->draw(Mat44::identity(), render_q);
 	RendererOGL().render(render_q);
 }

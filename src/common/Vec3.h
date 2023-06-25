@@ -24,7 +24,7 @@ public:
 	float len()const{ return sqrtf(lensq()); }
 	float lensq()const{ return this->dot(*this); }
 	float dot(const Vec3& o)const{ return x*o.x+y*o.y+z*o.z; }
-	Vec3 cross(const Vec3& o)const{ throw "Unimplemented"; }
+	Vec3 cross(const Vec3& o)const{ return {y*o.z-z*o.y, z*o.x-x*o.z, x*o.y-y*o.x}; }
 	Vec3 rotated(const Vec3& axis, float angle)const{
 		auto sin_ha = sin(angle/2);
 		auto cos_ha = cos(angle/2);
@@ -34,6 +34,7 @@ public:
 		return {res.x,res.y,res.z};
 	}
 	bool isOrtho(const Vec3& o)const{ return fabs(this->dot(o))<eps; }
+	bool isUnit()const{ return fabs(lensq()-1)<eps; }
 };
 
 #include <ostream>
