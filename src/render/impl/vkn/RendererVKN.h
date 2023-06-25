@@ -1,11 +1,6 @@
 #pragma once
 #include "render/Renderer.h"
-namespace ge
-{
-	namespace render
-	{
-		class RendererVKN : public Renderer
-		{
-		};
-	}
-}
+
+class RendererVKN: public Renderer{
+	virtual void render(const std::vector<RenderRequest>& render_q){ throw "Unimplemented"; };
+};

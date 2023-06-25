@@ -12,18 +12,29 @@ Mesh::Mesh(const std::string& file_path, Entity* owner): Component(owner){
 	}
 	if(scene->HasMeshes()){
 		auto assimp_mesh = scene->mMeshes[0];
-		primitive_type = assimp_mesh->mPrimitiveTypes;
+		
+		if(assimp_mesh->mPrimitiveTypes & aiPrimitiveType_POINT)
+			primitive_type = PrimitiveType::points;
+		else if(assimp_mesh->mPrimitiveTypes & aiPrimitiveType_LINE)
+			primitive_type = PrimitiveType::lines;
+		else if(assimp_mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE)
+			primitive_type = PrimitiveType::triangles;
+		else
+			throw "Unimplemented";
+
 		vertices.resize(assimp_mesh->mNumVertices);
-		for(int i=0;i<assimp_mesh->mNumVertices;i++){
+		for(int i=0;i<vertices.size();i++){
 			vertices[i]={
 				assimp_mesh->mVertices[i].x,
 				assimp_mesh->mVertices[i].y,
 				assimp_mesh->mVertices[i].z};
 		}
+		
+		faces.resize(assimp_mesh->mNumFaces);
+		for(int i=0;i<faces.size();i++){
+			faces[i].assign(
+				assimp_mesh->mFaces[i].mIndices,
+				assimp_mesh->mFaces[i].mIndices+assimp_mesh->mFaces[i].mNumIndices);
+		}
 	}
-}
-
-void Mesh::draw(Mat44 parent_space, std::vector<std::pair<Mat44,std::vector<Vec3>>>& render_q)const{
-	//TODO:
-	//render_q.emplace_back(local_space, vertices)
 }

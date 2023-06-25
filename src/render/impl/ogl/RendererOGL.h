@@ -1,11 +1,7 @@
 #pragma once
 #include "render/Renderer.h"
-namespace ge
-{
-	namespace render
-	{
-		class RendererOGL : public Renderer
-		{
-		};
-	}
-}
+
+class RendererOGL: public Renderer{
+public:
+	virtual void render(const std::vector<RenderRequest>& render_q) override;
+};

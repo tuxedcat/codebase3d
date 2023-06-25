@@ -1,7 +1,9 @@
 #include "GL/glut.h"
 #include <cmath>
 #include "GLFW/glfw3.h"
+#include "game/Entity.h"
 #include "game/Mesh.h"
+#include "render/impl/ogl/RendererOGL.h"
 
 using namespace std;
 
@@ -38,8 +40,12 @@ void display(){
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0,0,-10);
-	drawSphere(8, 8);
-	Mesh("untitled.obj");
+	// drawSphere(8, 8);
+	auto ent=Entity();
+	ent.LoadMesh("untitled.obj");
+	vector<RenderRequest> render_q;
+	ent.draw(Mat44::identity(), render_q);
+	RendererOGL().render(render_q);
 }
 
 int main(){
