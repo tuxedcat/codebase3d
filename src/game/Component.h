@@ -1,3 +1,4 @@
+#pragma once
 struct Entity;
 struct Component{
 public:

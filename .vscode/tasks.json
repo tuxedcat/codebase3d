@@ -4,7 +4,7 @@
 		{
 			"label": "Run(Debug)",
 			"type": "shell",
-			"command": "build/${relativeFile}/Debug/gameengine.out",
+			"command": "build/${relativeFile}/Debug/src/gameengine.out",
 			"dependsOn": [
 				"Build"
 			]

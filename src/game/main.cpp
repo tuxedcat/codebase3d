@@ -1,8 +1,11 @@
-#include "gameengine.h"
+#include "GL/glut.h"
+#include <cmath>
 #include "GLFW/glfw3.h"
+#include "game/Mesh.h"
 
 using namespace std;
 
+const double PI = 3.14159265358979323846;
 void drawSphere(int slices, int stacks){
 	for (int i = 0; i < slices; ++i){
 		double lat0 = PI * (-0.5 + static_cast<double>(i) / slices);
@@ -36,6 +39,7 @@ void display(){
 	glLoadIdentity();
 	glTranslatef(0,0,-10);
 	drawSphere(8, 8);
+	Mesh("untitled.obj");
 }
 
 int main(){

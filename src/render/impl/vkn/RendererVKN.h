@@ -1,9 +1,10 @@
+#pragma once
 #include "render/Renderer.h"
 namespace ge
 {
 	namespace render
 	{
-		class RendererOGL : public Renderer
+		class RendererVKN : public Renderer
 		{
 		};
 	}
