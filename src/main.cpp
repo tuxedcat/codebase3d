@@ -15,7 +15,7 @@ Entity* entity_root;
 Entity* cube;
 Camera* camera;
 
-void display(){
+void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -73,7 +73,7 @@ int main(){
 		gluPerspective(60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 100.0);
 
 		update();
-		display();
+		render();
 	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
