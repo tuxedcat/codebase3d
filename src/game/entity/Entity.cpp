@@ -1,5 +1,5 @@
-#include "game/Entity.h"
-#include "game/Mesh.h"
+#include "game/entity/Entity.h"
+#include "game/component/Mesh.h"
 
 Entity::~Entity(){
 	for(auto child: children)

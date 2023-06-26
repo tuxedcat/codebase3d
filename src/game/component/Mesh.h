@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 #include "common/Vec3.h"
 #include "common/Mat44.h"
-#include "game/Component.h"
+#include "game/component/Component.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"

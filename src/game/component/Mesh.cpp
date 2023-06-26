@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "game/component/Mesh.h"
 
 Mesh::Mesh(const std::string& file_path, Entity* owner): Component(owner){
 	Assimp::Importer importer;

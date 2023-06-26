@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "game/entity/Entity.h"
 
 //Initially, it looks at (0,0,-1)
 struct Camera: public Entity{

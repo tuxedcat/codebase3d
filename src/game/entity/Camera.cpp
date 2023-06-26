@@ -1,5 +1,5 @@
-#include "game/Camera.h"
-#include "Entity.h"
+#include "game/entity/Camera.h"
+#include "game/entity/Entity.h"
 
 Mat44 Camera::world2camera()const{
 	auto ret=Mat44::identity();

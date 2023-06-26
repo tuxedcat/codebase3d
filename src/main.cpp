@@ -2,9 +2,9 @@
 #include <cmath>
 #include <iostream>
 #include "GLFW/glfw3.h"
-#include "game/Entity.h"
-#include "game/Mesh.h"
-#include "game/Camera.h"
+#include "game/entity/Entity.h"
+#include "game/component/Mesh.h"
+#include "game/entity/Camera.h"
 #include "render/impl/ogl/RendererOGL.h"
 #include <unistd.h>
 
