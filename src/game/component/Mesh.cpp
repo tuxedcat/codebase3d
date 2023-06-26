@@ -8,7 +8,7 @@ Mesh::Mesh(const std::string& file_path, Entity* owner): Component(owner){
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_SortByPType);
 	if(scene==nullptr){
-		throw importer.GetErrorString();
+		throw std::string(importer.GetErrorString());
 	}
 	if(scene->HasMeshes()){
 		auto assimp_mesh = scene->mMeshes[0];
