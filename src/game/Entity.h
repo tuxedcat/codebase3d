@@ -35,8 +35,6 @@ public:
 	}
 	void scale(const Vec3& v){_scale=v;}
 
-	void draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
-	void LoadMesh(const std::string& file_path);
 	Entity* parent()const{return _parent;}
 	void adopt(Entity* child){
 		assert(child);
@@ -53,6 +51,7 @@ public:
 			return;
 		_parent->abandon(this);
 	}
+
 	Mat44 local2parent()const{
 		Mat44 mscale={
 			scale().x,0,0,0,
@@ -85,6 +84,13 @@ public:
 		};
 		return mscale*mrotate*mposition;
 	}
+
+	void LoadMesh(const std::string& file_path);
+
+	void draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
+	void update(float delta_time);
+
+	void(*onUpdate)(Entity* self, float delta_time)=nullptr;
 private:
 	Vec3 _position;
 	Quaternion _rotate;

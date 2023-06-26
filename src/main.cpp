@@ -19,12 +19,21 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	cube->rotate({1,1,-1},0.01f);
 	
 	vector<RenderRequest> render_q;
 	entity_root->draw(camera->world2camera(), render_q);
 	RendererOGL().render(render_q);
+}
+
+#include <chrono>
+void update(){
+	using namespace std::chrono;
+	static auto prev_time = steady_clock::now();
+	auto cur_time = steady_clock::now();
+	auto delta_time = duration_cast<duration<double>>(cur_time - prev_time).count();
+	entity_root->update(delta_time);
+	prev_time = cur_time;
+	// std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
 }
 
 int main(){
@@ -48,7 +57,9 @@ int main(){
 	
 	cube = new Entity(entity_root);
 	cube->LoadMesh("untitled.obj");
-	// cube->position({0,0,-5});
+	cube->onUpdate=[](Entity*self, float delta_time){
+		self->rotate({1,1,-1}, delta_time);
+	};
 
 	while(!glfwWindowShouldClose(window)){
 		// Set viewport
@@ -61,9 +72,10 @@ int main(){
 		glLoadIdentity();
 		gluPerspective(60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 100.0);
 
+		update();
 		display();
+	
 		glfwSwapBuffers(window);
-
 		glfwPollEvents();
 	}
 	glfwTerminate();
