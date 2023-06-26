@@ -4,7 +4,6 @@
 #include "GLFW/glfw3.h"
 #include "game/entity/Entity.h"
 #include "game/component/Mesh.h"
-#include "game/entity/Camera.h"
 #include "render/impl/ogl/RendererOGL.h"
 #include <unistd.h>
 
@@ -13,15 +12,25 @@ using namespace std;
 const int PI=acosf(-1);
 Entity* entity_root;
 Entity* cube;
-Camera* camera;
+Entity* camera;
 
 void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	if(!camera)
+		throw "No camera selected";
+	auto world2camera=Mat44::identity();
+	world2camera=world2camera*camera->parent2local();
+	auto parent_iter=camera->parent();
+	while(parent_iter){
+		world2camera=world2camera*parent_iter->parent2local();
+		parent_iter=parent_iter->parent();
+	}
 	
 	vector<RenderRequest> render_q;
-	entity_root->draw(camera->world2camera(), render_q);
+	entity_root->draw(world2camera, render_q);
 	RendererOGL().render(render_q);
 }
 
@@ -51,7 +60,7 @@ int main(){
 
 	entity_root= new Entity();
 
-	camera = new Camera(entity_root);
+	camera = new Entity(entity_root);
 	camera->position({0,5,5});
 	camera->rotate({1,0,0},-PI/2);
 	
