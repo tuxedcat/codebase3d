@@ -24,6 +24,7 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 		glBegin(PrimitiveType2GL(req.primitive_type));
 		for(auto face:req.faces){
 			for(auto i:face){
+				glNormal3f(req.normals[i].x,req.normals[i].y,req.normals[i].z);
 				glVertex3f(req.vertices[i].x,req.vertices[i].y,req.vertices[i].z);
 			}
 		}

@@ -10,31 +10,51 @@
 using namespace std;
 
 const float PI=acosf(-1);
+GLFWwindow* window;
 Entity* entity_root;
 Entity* camera;
 
 void init(){
-		entity_root= new Entity();
+	if(!glfwInit())
+		throw "glfwInit() failed";
+	window = glfwCreateWindow(1280, 720, "Game Engine", NULL, NULL);
+	if(!window)
+		throw "glfwCreateWindow() failed";
+	glfwMakeContextCurrent(window);
 
-		camera = new Entity(entity_root);
-		camera->position({0,10,10});
-		camera->rotate({1,0,0},-PI/8);
-		// camera->onUpdate=[](Entity*self, float delta_time){
-		// 	self->rotate({1,0,0}, delta_time);
-		// };
-		
-		auto cube = new Entity(entity_root);
-		cube->LoadMesh("models/koume.fbx");
-		cube->scale({0.1,0.1f,0.1f});
-		cube->onUpdate=[](Entity*self, float delta_time){
-			self->rotate({0,1,0}, delta_time);
-		};
+	glClearColor(0.6, 0.85, 1.0, 0.0);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	glShadeModel (GL_SMOOTH);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	entity_root= new Entity();
+	camera = new Entity(entity_root);
+	camera->position({0,10,10});
+	camera->rotate({1,0,0},-PI/8);
+	// camera->onUpdate=[](Entity*self, float delta_time){
+	// 	self->rotate({1,0,0}, delta_time);
+	// };
+	auto cube = new Entity(entity_root);
+	cube->LoadMesh("models/koume.fbx");
+	cube->scale({0.1,0.1f,0.1f});
+	cube->onUpdate=[](Entity*self, float delta_time){
+		self->rotate({0,1,0}, delta_time);
+	};
 }
 
 void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	
+	// GLfloat light_pos[4]={camX,camY,camZ,0.0};//Light pos = camera pos
+	GLfloat light_pos[4]={1,1,1,0};//Light pos = absolute
+	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
 	if(!camera)
 		throw "No camera selected";
@@ -64,18 +84,6 @@ void update(){
 
 int main(){
 	try{
-		if(!glfwInit()){
-			return -1;
-		}
-
-		GLFWwindow* window = glfwCreateWindow(1280, 720, "Game Engine", NULL, NULL);
-		if(!window){
-			glfwTerminate();
-			return -1;
-		}
-		glfwMakeContextCurrent(window);
-		glClearColor(0.6, 0.85, 1.0, 0.0);
-
 		init();
 		while(!glfwWindowShouldClose(window)){
 			// Set viewport

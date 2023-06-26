@@ -12,7 +12,7 @@
 class Mesh:public Component{
 public:
 	PrimitiveType primitive_type;
-	std::vector<Vec3> vertices;
+	std::vector<Vec3> vertices, normals;
 	std::vector<std::vector<uint>> faces;
 	Mesh(): Component(), primitive_type(PrimitiveType::points){}
 	Mesh(const std::string& file_path, Entity* owner=nullptr);

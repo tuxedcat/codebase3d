@@ -23,11 +23,16 @@ Mesh::Mesh(const std::string& file_path, Entity* owner): Component(owner){
 			throw "Unimplemented";
 
 		vertices.resize(assimp_mesh->mNumVertices);
+		normals.resize(assimp_mesh->mNumVertices);
 		for(int i=0;i<vertices.size();i++){
 			vertices[i]={
 				assimp_mesh->mVertices[i].x,
 				assimp_mesh->mVertices[i].y,
 				assimp_mesh->mVertices[i].z};
+			normals[i]={
+				assimp_mesh->mNormals[i].x,
+				assimp_mesh->mNormals[i].y,
+				assimp_mesh->mNormals[i].z};
 		}
 		
 		faces.resize(assimp_mesh->mNumFaces);
