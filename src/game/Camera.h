@@ -1,5 +1,7 @@
 #pragma once
 #include "Entity.h"
+
+//Initially, it looks at (0,0,-1)
 struct Camera: public Entity{
 	Camera(
 		Entity* parent=nullptr,

@@ -20,8 +20,7 @@ void display(){
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	cube->rotate({1,1,1},0.01f);
-	// camera->rotate({1,0,0},0.003f);
+	cube->rotate({1,1,-1},0.01f);
 	
 	vector<RenderRequest> render_q;
 	entity_root->draw(camera->world2camera(), render_q);
