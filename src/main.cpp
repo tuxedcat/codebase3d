@@ -9,9 +9,8 @@
 
 using namespace std;
 
-const int PI=acosf(-1);
+const float PI=acosf(-1);
 Entity* entity_root;
-Entity* cube;
 Entity* camera;
 
 void render(){
