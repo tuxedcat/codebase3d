@@ -20,10 +20,10 @@ GLenum PrimitiveType2GL(PrimitiveType prim_type){
 
 void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 	
-	//temporal camera transform code
-	glTranslatef(0,0,-10);
-	glRotatef(45,1,0,0);
-	glRotatef(45,0,1,0);
+	// //temporal camera transform code
+	// glTranslatef(0,0,-10);
+	// glRotatef(45,1,0,0);
+	// glRotatef(45,0,1,0);
 	
 	for(const auto&req:render_q){
 		glMultMatrixf((const float*)req.to_world.transposed().a);
