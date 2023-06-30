@@ -48,14 +48,6 @@ void init(){
 }
 
 void render(){
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	
-	// GLfloat light_pos[4]={camX,camY,camZ,0.0};//Light pos = camera pos
-	GLfloat light_pos[4]={1,1,1,0};//Light pos = absolute
-	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-
 	if(!camera)
 		throw "No camera selected";
 	auto world2camera=Mat44::identity();

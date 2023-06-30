@@ -24,7 +24,9 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 			mesh->primitive_type,
 			mesh->vertices,
 			mesh->normals,
-			mesh->faces);
+			mesh->texcoord,
+			mesh->faces,
+			mesh->getMaterial()->getTextureID());
 }
 
 void Entity::update(float delta_time){
