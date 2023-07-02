@@ -14,6 +14,7 @@ struct Mesh;
 struct Entity{
 	static Entity* loadFromFile(const std::string& model_path);
 public:
+	std::string name;
 	Entity(
 		Entity* parent=nullptr,
 		const Vec3& position={0,0,0},

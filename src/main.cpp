@@ -35,14 +35,14 @@ void init(){
 	entity_root= new Entity();
 	camera = new Entity(entity_root);
 	// camera->position({0,10,10});
-	camera->position({0,10,10});
+	camera->position({0,5,10});
 	camera->rotate({1,0,0},-PI/8);
 	// camera->onUpdate=[](Entity*self, float delta_time){
 	// 	self->rotate({1,0,0}, delta_time);
 	// };
 	
 	auto cube = Entity::loadFromFile("models/koume.fbx");
-	cube->scale({0.1, 0.1, 0.1});
+	cube->scale({0.3, 0.3, 0.3});
 	cube->onUpdate=[](Entity*self, float delta_time){
 		self->rotate({0,1,0}, delta_time);
 	};

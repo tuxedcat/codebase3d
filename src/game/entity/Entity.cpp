@@ -2,21 +2,27 @@
 #include "game/component/Mesh.h"
 #include "render/Renderer.h"
 #include <iostream>
+using namespace std;
 
 Entity* Entity::loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** materials){
 	if(!node)
 		return nullptr;
-	auto ret = new Entity;
-	for(int i=0;i<node->mNumChildren;i++)
-		ret->adopt(loadFromFileImpl(node->mChildren[i],meshes,materials));
 
-	// auto mtx = node->mTransformation;
-	// ret->position({mtx.a4,mtx.b4,mtx.c4});
-	// mtx.a4=mtx.b4=mtx.c4=0;
+	auto ret = new Entity;	
+	ret->name = node->mName.C_Str();
+	auto mtx = node->mTransformation;
+	ret->position({mtx.a4,mtx.b4,mtx.c4});
+	mtx.a4=mtx.b4=mtx.c4=0;
 	// ret->scale({
 	// 	sqrtf(mtx.a1*mtx.a1 + mtx.b1*mtx.b1 + mtx.c1*mtx.c1),
-	// 	sqrtf(mtx.a1*mtx.a2 + mtx.b1*mtx.b2 + mtx.c1*mtx.c2),
-	// 	sqrtf(mtx.a1*mtx.a3 + mtx.b1*mtx.b3 + mtx.c1*mtx.c3)});
+	// 	sqrtf(mtx.a2*mtx.a2 + mtx.b2*mtx.b2 + mtx.c2*mtx.c2),
+	// 	sqrtf(mtx.a3*mtx.a3 + mtx.b3*mtx.b3 + mtx.c3*mtx.c3)});
+	// if(ret->name=="Armature")
+	// 	ret->scale({1,1,1});
+	cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
+
+	for(int i=0;i<node->mNumChildren;i++)
+		ret->adopt(loadFromFileImpl(node->mChildren[i],meshes,materials));
 	// mtx.a1/=ret->scale().x;
 	// mtx.b1/=ret->scale().x;
 	// mtx.c1/=ret->scale().x;
