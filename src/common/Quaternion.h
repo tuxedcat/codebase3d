@@ -9,6 +9,17 @@ public:
 	float w,x,y,z;
 	Quaternion():w(1),x(0),y(0),z(0){}
 	Quaternion(float w,float x,float y,float z):w(w),x(x),y(y),z(z){}
+	Quaternion(const Mat44& mat):
+		Quaternion(
+			sqrtf(1+mat.a[0][0]+mat.a[1][1]+mat.a[2][2]),
+			(mat.a[2][1]-mat.a[1][2])/(4*w),
+			(mat.a[0][2]-mat.a[2][0])/(4*w),
+			(mat.a[1][0]-mat.a[0][1])/(4*w)){
+		//https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		//TODO: assert special orthogonal matrix
+		if(isnanf(w))
+			*this=Quaternion();
+	}
 	Quaternion operator*(const Quaternion& o)const{
 		return {
 			w*o.w - x*o.x - y*o.y - z*o.z,

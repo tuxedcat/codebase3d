@@ -6,8 +6,13 @@
 #include "common/Vec3.h"
 #include "common/Quaternion.h"
 #include "render/Renderer.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+
 struct Mesh;
 struct Entity{
+	static Entity* loadFromFile(const std::string& model_path);
 public:
 	Entity(
 		Entity* parent=nullptr,
@@ -33,6 +38,7 @@ public:
 		auto cos_ha = cos(angle/2);
 		_rotate=(Quaternion(cos_ha, axis.x*sin_ha, axis.y*sin_ha, axis.z*sin_ha)*_rotate).normalized();
 	}
+	void setRotate(const Quaternion& q){ _rotate=q; }
 	void scale(const Vec3& v){_scale=v;}
 
 	Entity* parent()const{return _parent;}
@@ -85,8 +91,6 @@ public:
 		return mscale*mrotate*mposition;
 	}
 
-	void LoadMesh(const std::string& file_path);
-
 	void draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
 	void update(float delta_time);
 
@@ -98,4 +102,5 @@ private:
 	Entity* _parent;
 	std::list<Entity*> children;
 	Mesh* mesh;
+	static Entity* loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** materials);
 };
