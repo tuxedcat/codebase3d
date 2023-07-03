@@ -1,11 +1,16 @@
-#include "GL/glut.h"
-#include <cmath>
 #include <iostream>
+#include <limits>
+#include <cmath>
+#include <chrono>
+#include <unistd.h>
+
+#include "GL/glut.h"
 #include "GLFW/glfw3.h"
+
 #include "game/entity/Entity.h"
 #include "game/component/Mesh.h"
+#include "game/event/Manager.h"
 #include "render/impl/ogl/RendererOGL.h"
-#include <unistd.h>
 
 using namespace std;
 
@@ -21,6 +26,9 @@ void init(){
 	if(!window)
 		throw "glfwCreateWindow() failed";
 	glfwMakeContextCurrent(window);
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos){
+		evt::Manager::pushEvent({float(xpos), float(ypos)});
+	});
 
 	glClearColor(0.6, 0.85, 1.0, 0.0);
 	glEnable(GL_LIGHTING);
@@ -37,9 +45,16 @@ void init(){
 	// camera->position({0,10,10});
 	camera->position({0,5,10});
 	camera->rotate({1,0,0},-PI/8);
-	// camera->onUpdate=[](Entity*self, float delta_time){
-	// 	self->rotate({1,0,0}, delta_time);
-	// };
+	evt::Manager::addHandler([](const evt::MouseMove& e){
+		static double prev_x=numeric_limits<double>::quiet_NaN(), prev_y=numeric_limits<double>::quiet_NaN();
+		if(isnan(prev_x)==false and isnan(prev_y)==false){
+			float dx = e.x-prev_x;
+			float dy = e.y-prev_y;
+			camera->rotate(Vec3{dy,dx,0},(fabs(dx)+fabs(dy))/100);
+		}
+		prev_x=e.x;
+		prev_y=e.y;
+	});
 	
 	auto cube = Entity::loadFromFile("models/koume.fbx");
 	cube->scale({0.3, 0.3, 0.3});
@@ -65,12 +80,12 @@ void render(){
 	RendererOGL().render(render_q);
 }
 
-#include <chrono>
 void update(){
 	using namespace std::chrono;
 	static auto prev_time = steady_clock::now();
 	auto cur_time = steady_clock::now();
 	auto delta_time = duration_cast<duration<double>>(cur_time - prev_time).count();
+	evt::Manager::patchEvents();
 	entity_root->update(delta_time);
 	prev_time = cur_time;
 	// std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;

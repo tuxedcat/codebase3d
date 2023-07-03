@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include "common/Quaternion.h"
+#include "common/Float.h"
 
 class Vec3{
 public:
@@ -33,8 +34,15 @@ public:
 		auto res = qaxis*qvec*qaxis.conjugate();
 		return {res.x,res.y,res.z};
 	}
-	bool isOrtho(const Vec3& o)const{ return fabs(this->dot(o))<eps; }
-	bool isUnit()const{ return fabs(lensq()-1)<eps; }
+	Vec3 normalized()const{	
+		float lsq=lensq();
+		if(float_neq(lsq, 1))
+			return *this/fsqrt(lsq);
+		return *this;
+	}
+	void normalize(){ *this=normalized(); }
+	bool isOrtho(const Vec3& o)const{ return float_zero(this->dot(o)); }
+	bool isUnit()const{ return float_eq(lensq(), 1); }
 };
 
 #include <ostream>

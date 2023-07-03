@@ -34,7 +34,8 @@ public:
 	Quaternion rotate()const{return _rotate;}
 	Vec3 scale()const{return _scale;}
 	void position(const Vec3& v){_position=v;}
-	void rotate(const Vec3& axis, float angle){
+	void rotate(Vec3 axis, float angle){
+		axis.normalize();
 		auto sin_ha = sin(angle/2);
 		auto cos_ha = cos(angle/2);
 		_rotate=(Quaternion(cos_ha, axis.x*sin_ha, axis.y*sin_ha, axis.z*sin_ha)*_rotate).normalized();

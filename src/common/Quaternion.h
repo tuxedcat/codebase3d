@@ -3,6 +3,7 @@
 #include <cassert>
 #include "common/Config.h"
 #include "common/Mat44.h"
+#include "common/Float.h"
 
 class Quaternion{
 public:
@@ -32,8 +33,13 @@ public:
 	Quaternion operator*(float s)const{ return {w*s, x*s, y*s, z*s}; }
 	Quaternion operator/(float s)const{ return {w/s, x/s, y/s, z/s}; }
 
-	Quaternion& normalize(){ auto l=len(); w/=l,x/=l,y/=l,z/=l; return *this;}
-	Quaternion normalized()const{ return *this/len(); }
+	Quaternion normalized()const{		
+		float lsq=lensq();
+		if(float_neq(lsq, 1))
+			return *this/fsqrt(lsq);
+		return *this/len();
+	}
+	void normalize(){ *this=normalized(); }
 	Quaternion conjugate()const{ return {w,-x,-y,-z}; }
 	float lensq()const{ return w*w + x*x + y*y + z*z; }
 	float len()const{ return sqrtf(lensq()); }
