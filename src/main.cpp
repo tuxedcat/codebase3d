@@ -27,7 +27,37 @@ void init(){
 		throw "glfwCreateWindow() failed";
 	glfwMakeContextCurrent(window);
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos){
-		evt::Manager::pushEvent({float(xpos), float(ypos)});
+		evt::Manager<evt::MouseMove>::pushEvent({float(xpos), float(ypos)});
+	});
+	glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods){
+		switch(action){
+		case GLFW_PRESS:
+			switch(button){
+			case GLFW_MOUSE_BUTTON_LEFT:
+				evt::Manager<evt::MousePress>::pushEvent({evt::MouseButtonType::left});
+				break;
+			case GLFW_MOUSE_BUTTON_RIGHT:
+				evt::Manager<evt::MousePress>::pushEvent({evt::MouseButtonType::right});
+				break;
+			default:
+				throw "Unknown button type";
+			}
+			break;
+		case GLFW_RELEASE:
+			switch(button){
+			case GLFW_MOUSE_BUTTON_LEFT:
+				evt::Manager<evt::MouseRelease>::pushEvent({evt::MouseButtonType::left});
+				break;
+			case GLFW_MOUSE_BUTTON_RIGHT:
+				evt::Manager<evt::MouseRelease>::pushEvent({evt::MouseButtonType::right});
+				break;
+			default:
+				throw "Unknown button type";
+			}
+			break;
+		default:
+			throw "Unknown";
+		}
 	});
 
 	glClearColor(0.6, 0.85, 1.0, 0.0);
@@ -45,15 +75,24 @@ void init(){
 	// camera->position({0,10,10});
 	camera->position({0,5,10});
 	camera->rotate({1,0,0},-PI/8);
-	evt::Manager::addHandler([](const evt::MouseMove& e){
+	static bool mouse_pressing=false;
+	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
 		static double prev_x=numeric_limits<double>::quiet_NaN(), prev_y=numeric_limits<double>::quiet_NaN();
-		if(isnan(prev_x)==false and isnan(prev_y)==false){
+		if(mouse_pressing && isnan(prev_x)==false and isnan(prev_y)==false){
 			float dx = e.x-prev_x;
 			float dy = e.y-prev_y;
 			camera->rotate(Vec3{dy,dx,0},(fabs(dx)+fabs(dy))/100);
 		}
 		prev_x=e.x;
 		prev_y=e.y;
+	});
+	evt::Manager<evt::MousePress>::addHandler([&](const evt::MousePress& e){
+		if(e.btnType==evt::MouseButtonType::left)
+			mouse_pressing=true;
+	});
+	evt::Manager<evt::MouseRelease>::addHandler([&](const evt::MouseRelease& e){
+		if(e.btnType==evt::MouseButtonType::left)
+			mouse_pressing=false;
 	});
 	
 	auto cube = Entity::loadFromFile("models/koume.fbx");
@@ -85,7 +124,9 @@ void update(){
 	static auto prev_time = steady_clock::now();
 	auto cur_time = steady_clock::now();
 	auto delta_time = duration_cast<duration<double>>(cur_time - prev_time).count();
-	evt::Manager::patchEvents();
+	evt::Manager<evt::MouseMove>::patchEvents();
+	evt::Manager<evt::MousePress>::patchEvents();
+	evt::Manager<evt::MouseRelease>::patchEvents();
 	entity_root->update(delta_time);
 	prev_time = cur_time;
 	// std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
