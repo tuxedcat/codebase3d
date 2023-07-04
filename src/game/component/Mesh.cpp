@@ -7,7 +7,7 @@ using namespace std;
 
 Material::Material(const std::string& texture_path){
 	int width, height, channels;
-	auto path = string("models\\"+texture_path);
+	auto path = string(texture_path);
 	std::replace(path.begin(), path.end(), '\\', '/');
 	unsigned char* image = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
 	if(!image)
@@ -25,10 +25,8 @@ Material::~Material(){
 	glDeleteTextures(1, &textureID);
 }
 
-Mesh::Mesh(Entity* owner): Component(owner), primitive_type(PrimitiveType::points){
+Mesh::Mesh(Entity* owner): Component(owner), primitive_type(PrimitiveType::points), material(Material::null()){
 }
 
 Mesh::~Mesh(){
-	if(material)
-		delete material;
 }

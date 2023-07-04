@@ -14,7 +14,7 @@ struct RenderRequest{
 	PrimitiveType primitive_type;
 	std::vector<Vec3> vertices, normals, texcoord;
 	std::vector<std::vector<uint>> faces;
-	unsigned int textureID;
+	unsigned int textureID; //if not exist: -1
 };
 
 class Renderer{

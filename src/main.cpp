@@ -72,8 +72,8 @@ void init(){
 
 	entity_root= new Entity();
 	camera = new Entity(entity_root);
-	// camera->position({0,10,10});
-	camera->position({0,5,10});
+	camera->name="camera";
+	camera->position({0,10,20});
 	camera->rotate({1,0,0},-PI/8);
 	static bool mouse_pressing=false;
 	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
@@ -95,8 +95,10 @@ void init(){
 			mouse_pressing=false;
 	});
 	
-	auto cube = Entity::loadFromFile("models/koume.fbx");
-	cube->scale({0.3, 0.3, 0.3});
+	// auto cube = Entity::loadFromFile("models/koume/koume.fbx");
+	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
+	auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
+	// cube->scale({0.03, 0.03, 0.03});
 	cube->onUpdate=[](Entity*self, float delta_time){
 		self->rotate({0,1,0}, delta_time);
 	};
@@ -113,7 +115,7 @@ void render(){
 		world2camera=world2camera*parent_iter->parent2local();
 		parent_iter=parent_iter->parent();
 	}
-	
+
 	vector<RenderRequest> render_q;
 	entity_root->draw(world2camera, render_q);
 	RendererOGL().render(render_q);
@@ -144,7 +146,7 @@ int main(){
 			// Set projection
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 100.0);
+			gluPerspective(60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 1000.0);
 
 			update();
 			render();

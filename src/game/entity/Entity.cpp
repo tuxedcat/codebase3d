@@ -4,25 +4,33 @@
 #include <iostream>
 using namespace std;
 
-Entity* Entity::loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** materials){
+Entity* Entity::loadFromFileImpl(const string& model_directory, aiNode* node, aiMesh** meshes, aiMaterial** materials){
 	if(!node)
 		return nullptr;
 
 	auto ret = new Entity;	
 	ret->name = node->mName.C_Str();
-	auto mtx = node->mTransformation;
-	ret->position({mtx.a4,mtx.b4,mtx.c4});
-	mtx.a4=mtx.b4=mtx.c4=0;
+	// auto mtx = node->mTransformation;
+	// ret->position({mtx.a4,mtx.b4,mtx.c4});
+	// mtx.a4=mtx.b4=mtx.c4=0;
 	// ret->scale({
 	// 	sqrtf(mtx.a1*mtx.a1 + mtx.b1*mtx.b1 + mtx.c1*mtx.c1),
 	// 	sqrtf(mtx.a2*mtx.a2 + mtx.b2*mtx.b2 + mtx.c2*mtx.c2),
 	// 	sqrtf(mtx.a3*mtx.a3 + mtx.b3*mtx.b3 + mtx.c3*mtx.c3)});
+	// ret->scale({
+	// 	sqrtf(mtx.a1*mtx.a1 + mtx.a2*mtx.a2 + mtx.a3*mtx.a3),
+	// 	sqrtf(mtx.b1*mtx.b1 + mtx.b2*mtx.b2 + mtx.b3*mtx.b3),
+	// 	sqrtf(mtx.c1*mtx.c1 + mtx.c2*mtx.c2 + mtx.c3*mtx.c3)});
 	// if(ret->name=="Armature")
 	// 	ret->scale({1,1,1});
 	cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
 
-	for(int i=0;i<node->mNumChildren;i++)
-		ret->adopt(loadFromFileImpl(node->mChildren[i],meshes,materials));
+	for(int i=0;i<node->mNumChildren;i++){
+		// auto root=ret;
+		// while(ret->parent())
+		// 	ret=ret->parent();
+		ret->adopt(loadFromFileImpl(model_directory, node->mChildren[i], meshes, materials));
+	}
 	// mtx.a1/=ret->scale().x;
 	// mtx.b1/=ret->scale().x;
 	// mtx.c1/=ret->scale().x;
@@ -54,6 +62,7 @@ Entity* Entity::loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** mat
 		ret->mesh->normals.resize(mesh->mNumVertices);
 		ret->mesh->texcoord.resize(mesh->mNumVertices);
 		for(int i=0;i<ret->mesh->vertices.size();i++){
+			assert(mesh->HasNormals() and mesh->mTextureCoords[0]);
 			ret->mesh->vertices[i]={
 				mesh->mVertices[i].x,
 				mesh->mVertices[i].y,
@@ -79,7 +88,7 @@ Entity* Entity::loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** mat
 		if(diffuse_count > 0){
 			aiString assimp_textureName;
 			material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), assimp_textureName);
-			ret->mesh->material = new Material(assimp_textureName.data);
+			ret->mesh->material = make_shared<Material>(model_directory+"/"+assimp_textureName.data);
 		}
 	};
 	return ret;
@@ -88,16 +97,20 @@ Entity* Entity::loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** mat
 Entity* Entity::loadFromFile(const std::string& model_path){
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(model_path,
-		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_SortByPType);
+		aiProcess_CalcTangentSpace
+		|aiProcess_Triangulate
+		// |aiProcess_JoinIdenticalVertices
+		// |aiProcess_SortByPType
+		|aiProcess_FlipUVs
+		//aiProcess_SplitLargeMeshes, aiProcess_OptimizeMeshes 
+	);
 	if(scene==nullptr)
 		throw std::string(importer.GetErrorString());
 	if(!scene->HasMeshes())
 		throw "No meshes in the file.";
 
-	return loadFromFileImpl(scene->mRootNode, scene->mMeshes, scene->mMaterials);
+	auto model_directory = model_path.substr(0,model_path.find_last_of('/'));
+	return loadFromFileImpl(model_directory, scene->mRootNode, scene->mMeshes, scene->mMaterials);
 }
 
 Entity::~Entity(){

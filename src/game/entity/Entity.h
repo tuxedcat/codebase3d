@@ -104,5 +104,5 @@ private:
 	Entity* _parent;
 	std::list<Entity*> children;
 	Mesh* mesh;
-	static Entity* loadFromFileImpl(aiNode* node, aiMesh** meshes, aiMaterial** materials);
+	static Entity* loadFromFileImpl(const std::string& model_directory, aiNode* node, aiMesh** meshes, aiMaterial** materials);
 };
