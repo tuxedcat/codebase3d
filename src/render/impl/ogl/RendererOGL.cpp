@@ -30,7 +30,7 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 	glEnable(GL_TEXTURE_2D);
 
 	for(const auto&req:render_q){
-		glMultMatrixf((const float*)req.to_world.transposed().a);
+		glLoadMatrixf((const float*)req.to_world.transposed().a);
 		glBindTexture(GL_TEXTURE_2D, req.textureID);
 		glBegin(PrimitiveType2GL(req.primitive_type));
 		for(auto face:req.faces){
