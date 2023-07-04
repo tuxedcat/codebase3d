@@ -10,17 +10,17 @@ Entity* Entity::loadFromFileImpl(const string& model_directory, aiNode* node, ai
 
 	auto ret = new Entity;	
 	ret->name = node->mName.C_Str();
-	// auto mtx = node->mTransformation;
-	// ret->position({mtx.a4,mtx.b4,mtx.c4});
-	// mtx.a4=mtx.b4=mtx.c4=0;
+	auto mtx = node->mTransformation;
+	ret->position({mtx.a4,mtx.b4,mtx.c4});
+	mtx.a4=mtx.b4=mtx.c4=0;
 	// ret->scale({
 	// 	sqrtf(mtx.a1*mtx.a1 + mtx.b1*mtx.b1 + mtx.c1*mtx.c1),
 	// 	sqrtf(mtx.a2*mtx.a2 + mtx.b2*mtx.b2 + mtx.c2*mtx.c2),
 	// 	sqrtf(mtx.a3*mtx.a3 + mtx.b3*mtx.b3 + mtx.c3*mtx.c3)});
-	// ret->scale({
-	// 	sqrtf(mtx.a1*mtx.a1 + mtx.a2*mtx.a2 + mtx.a3*mtx.a3),
-	// 	sqrtf(mtx.b1*mtx.b1 + mtx.b2*mtx.b2 + mtx.b3*mtx.b3),
-	// 	sqrtf(mtx.c1*mtx.c1 + mtx.c2*mtx.c2 + mtx.c3*mtx.c3)});
+	ret->scale({
+		sqrtf(mtx.a1*mtx.a1 + mtx.a2*mtx.a2 + mtx.a3*mtx.a3),
+		sqrtf(mtx.b1*mtx.b1 + mtx.b2*mtx.b2 + mtx.b3*mtx.b3),
+		sqrtf(mtx.c1*mtx.c1 + mtx.c2*mtx.c2 + mtx.c3*mtx.c3)});
 	// if(ret->name=="Armature")
 	// 	ret->scale({1,1,1});
 	cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;

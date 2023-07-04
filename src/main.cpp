@@ -95,10 +95,10 @@ void init(){
 			mouse_pressing=false;
 	});
 	
-	// auto cube = Entity::loadFromFile("models/koume/koume.fbx");
+	auto cube = Entity::loadFromFile("models/koume/koume.fbx");
 	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
-	auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
-	// cube->scale({0.03, 0.03, 0.03});
+	// auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
+	cube->scale({0.1, 0.1, 0.1});
 	cube->onUpdate=[](Entity*self, float delta_time){
 		self->rotate({0,1,0}, delta_time);
 	};
