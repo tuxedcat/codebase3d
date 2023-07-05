@@ -2,7 +2,9 @@
 #include <initializer_list>
 #include <algorithm>
 
-struct Mat44{
+class Vec3;
+class Mat44{
+public:
 	static Mat44 identity(){ return {
 		1,0,0,0,
 		0,1,0,0,
@@ -25,6 +27,7 @@ struct Mat44{
 					b.a[i][j]+=a[i][k]*o.a[k][j];
 		return b;
 	}
+	Vec3 operator*(const Vec3& o)const;
 	Mat44& operator*=(const Mat44& o){ return *this = *this * o; }
 	Mat44 transposed()const{
 		auto ret=*this;

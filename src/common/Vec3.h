@@ -5,12 +5,14 @@
 
 class Vec3{
 public:
-	float x,y,z;
+	float a[3]{},&x,&y,&z;
 	static Vec3 zero(){ return {0,0,0}; }
 	static Vec3 one(){ return {1,1,1}; }
 	Vec3():Vec3(0,0,0){}
-	Vec3(float x, float y, float z):x(x),y(y),z(z){}
+	Vec3(float x, float y, float z):x(a[0]),y(a[1]),z(a[2]){ this->x=x; this->y=y; this->z=z; }
+	Vec3(const Vec3& o):x(a[0]),y(a[1]),z(a[2]){ this->x=o.x; this->y=o.y; this->z=o.z; }
 
+	Vec3& operator=(const Vec3& o){ x=o.x, y=o.y, z=o.z; return *this; }
 	Vec3 operator-()const{ return {-x,-y,-z}; }
 
 	Vec3 operator+(const Vec3& o)const{ return {x+o.x, y+o.y, z+o.z}; }

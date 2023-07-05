@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <iostream>
 #include "render/impl/ogl/RendererOGL.h"
 #include "GL/gl.h"
+using namespace std;
 
 GLenum PrimitiveType2GL(PrimitiveType prim_type){
 	switch(prim_type){
