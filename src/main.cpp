@@ -73,7 +73,7 @@ void init(){
 	entity_root= new Entity();
 	camera = new Entity(entity_root);
 	camera->name="camera";
-	camera->position({0,10,20});
+	camera->position({0,100,200});
 	camera->rotate({1,0,0},-PI/8);
 	static bool mouse_pressing=false;
 	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
@@ -98,7 +98,7 @@ void init(){
 	auto cube = Entity::loadFromFile("models/koume/koume.fbx");
 	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
 	// auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
-	cube->scale({0.1, 0.1, 0.1});
+	// cube->scale({0.1, 0.1, 0.1});
 	cube->onUpdate=[](Entity*self, float delta_time){
 		self->rotate({0,1,0}, delta_time);
 	};

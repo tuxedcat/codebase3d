@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <memory>
 #include "common/Vec3.h"
 #include "common/Quaternion.h"
 #include "render/Renderer.h"
@@ -23,8 +24,7 @@ public:
 		_position(position),
 		_rotate(rotate),
 		_scale(scale),
-		_parent(parent),
-		mesh(nullptr){
+		_parent(parent){
 		if(parent)
 			parent->adopt(this);
 	}
@@ -103,6 +103,6 @@ private:
 	Vec3 _scale;
 	Entity* _parent;
 	std::list<Entity*> children;
-	Mesh* mesh;
+	std::list<std::shared_ptr<Mesh>> meshes;
 	static Entity* loadFromFileImpl(const std::string& model_directory, aiNode* node, aiMesh** meshes, aiMaterial** materials);
 };
