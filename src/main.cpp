@@ -156,8 +156,10 @@ int main(){
 		}
 	}catch(const char* err){
 		cout<<"Unhandled exception(const char*): "<<err<<endl;
+		throw err;
 	}catch(const string& err){
 		cout<<"Unhandled exception(string): "<<err<<endl;
+		throw err;
 	}
 	glfwTerminate();
 	return 0;

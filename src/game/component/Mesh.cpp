@@ -1,5 +1,6 @@
 #include "game/component/Mesh.h"
 #include <iostream>
+#include <bit>
 #define STB_IMAGE_IMPLEMENTATION
 #include "render/stb_image.h"
 #include <string>
@@ -12,6 +13,10 @@ Material::Material(const std::string& texture_path){
 	unsigned char* image = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
 	if(!image)
 		throw stbi_failure_reason();
+	if(width!=height)
+		throw "Non square images are not supported.";
+	if(popcount<unsigned>(width)!=1)
+		throw "Non power of 2 sizes are not supported.";
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
