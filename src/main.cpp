@@ -4,7 +4,6 @@
 #include <chrono>
 #include <unistd.h>
 
-#include "GL/glut.h"
 #include "GLFW/glfw3.h"
 
 #include "game/entity/Entity.h"
@@ -144,9 +143,35 @@ int main(){
 			glViewport(0, 0, width, height);
 
 			// Set projection
+			//https://www.khronos.org/opengl/wiki/GluPerspective_code
+			auto glhPerspectivef2=[](float* matrix, float fovyInDegrees, float aspectRatio, float znear, float zfar){
+				float ymax, xmax;
+				ymax = znear * tanf(fovyInDegrees * M_PI / 360.0);
+				xmax = ymax * aspectRatio;
+				auto glhFrustumf2=[](float* mtx, float left, float right, float bottom, float top, float znear, float zfar){
+					float temp1, temp2, temp3, temp4;
+					temp1 = 2.0 * znear;
+					temp2 = right - left;
+					temp3 = top - bottom;
+					temp4 = zfar - znear;
+					mtx[0] = temp1 / temp2;
+					mtx[1] = mtx[2] = mtx[3] = mtx[4] = 0.0;
+					mtx[5] = temp1 / temp3;
+					mtx[6] = mtx[7] = 0.0;
+					mtx[8] = (right + left) / temp2;
+					mtx[9] = (top + bottom) / temp3;
+					mtx[10] = (-zfar - znear) / temp4;
+					mtx[11] = -1.0;
+					mtx[12] = mtx[13] = 0.0;
+					mtx[14] = (-temp1 * zfar) / temp4;
+					mtx[15] = 0.0;
+				};
+				glhFrustumf2(matrix, -xmax, xmax, -ymax, ymax, znear, zfar);
+			};
+			Mat44 projection;
+			glhPerspectivef2((float*)projection.a, 60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 1000.0);
 			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			gluPerspective(60.0, static_cast<double>(width) / static_cast<double>(height), 0.1, 1000.0);
+			glLoadMatrixf((float*)projection.a);
 
 			update();
 			render();
