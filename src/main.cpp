@@ -9,7 +9,7 @@
 #include "game/entity/Entity.h"
 #include "game/component/Mesh.h"
 #include "game/event/Manager.h"
-#include "render/impl/ogl/RendererOGL.h"
+#include "render/RendererOGL.h"
 
 using namespace std;
 

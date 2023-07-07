@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <iostream>
-#include "render/impl/ogl/RendererOGL.h"
+#include "render/RendererOGL.h"
 #include "GL/gl.h"
 using namespace std;
 
