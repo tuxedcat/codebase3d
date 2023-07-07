@@ -18,5 +18,8 @@ struct RenderRequest{
 };
 
 class Renderer{
-	virtual void render(const std::vector<RenderRequest>& render_q)=0;
+public:
+	virtual void render(const std::vector<RenderRequest>& render_q) = 0;
+	virtual void setProjection(float fovyInDegrees, float aspectRatio, float znear, float zfar) = 0;
+	virtual void setViewport(int width, int height) = 0;
 };
