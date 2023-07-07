@@ -61,20 +61,19 @@ public:
 	}
 
 	Mat44 local2parent()const{
-		Mat44 mscale={
+		Mat44 mat_scale={
 			scale().x,0,0,0,
 			0,scale().y,0,0,
 			0,0,scale().z,0,
 			0,0,0,1,
 		};
-		Mat44 mrotate=_rotate.toRotationMatrix();
-		Mat44 mposition={
+		Mat44 mat_position={
 			1,0,0,position().x,
 			0,1,0,position().y,
 			0,0,1,position().z,
 			0,0,0,1,
 		};
-		return mposition*mrotate*mscale;
+		return mat_position*mat_scale*_rotate.toRotationMatrix();
 	}
 	Mat44 parent2local()const{
 		Mat44 mscale={
