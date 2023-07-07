@@ -28,6 +28,8 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 	// GLfloat light_pos[4]={camX,camY,camZ,0.0};//Light pos = camera pos
 	GLfloat light_pos[4]={1,1,1,0};//Light pos = absolute
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+	GLfloat ambientLight[] = { 0.8f, 0.8f, 0.8f, 1.0f }; 
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight); 
 	
 	glEnable(GL_TEXTURE_2D);
 
