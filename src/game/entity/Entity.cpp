@@ -44,43 +44,49 @@ Entity* Entity::loadFromFileImpl(const string& model_directory, aiNode* node, ai
 	// 	mtx.c1,mtx.c2,mtx.c3,mtx.c4,
 	// 	mtx.d1,mtx.d2,mtx.d3,mtx.d4}));
 
-	for(int i=0;i<node->mNumMeshes;i++){
+	for(int idx_node=0;idx_node<node->mNumMeshes;idx_node++){
 		auto& retmesh = ret->meshes.emplace_back(new Mesh(ret));
-		auto mesh = meshes[node->mMeshes[i]];
+		auto mesh = meshes[node->mMeshes[idx_node]];
 		assert(mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE);
-		retmesh->primitive_type = PrimitiveType::triangles;
 
+		// copy shape informations
+		retmesh->primitive_type = PrimitiveType::triangles;
 		retmesh->vertices.resize(mesh->mNumVertices);
 		retmesh->normals.resize(mesh->mNumVertices);
 		retmesh->texcoord.resize(mesh->mNumVertices);
-		for(int i=0;i<retmesh->vertices.size();i++){
+		for(int idx_vtx=0;idx_vtx<retmesh->vertices.size();idx_vtx++){
 			assert(mesh->HasNormals() and mesh->mTextureCoords[0]);
-			retmesh->vertices[i]={
-				mesh->mVertices[i].x,
-				mesh->mVertices[i].y,
-				mesh->mVertices[i].z};
-			retmesh->normals[i]={
-				mesh->mNormals[i].x,
-				mesh->mNormals[i].y,
-				mesh->mNormals[i].z};
-			retmesh->texcoord[i]={
-				mesh->mTextureCoords[0][i].x,
-				mesh->mTextureCoords[0][i].y,
-				mesh->mTextureCoords[0][i].z};
+			retmesh->vertices[idx_vtx]={
+				mesh->mVertices[idx_vtx].x,
+				mesh->mVertices[idx_vtx].y,
+				mesh->mVertices[idx_vtx].z};
+			retmesh->normals[idx_vtx]={
+				mesh->mNormals[idx_vtx].x,
+				mesh->mNormals[idx_vtx].y,
+				mesh->mNormals[idx_vtx].z};
+			retmesh->texcoord[idx_vtx]={
+				mesh->mTextureCoords[0][idx_vtx].x,
+				mesh->mTextureCoords[0][idx_vtx].y,
+				mesh->mTextureCoords[0][idx_vtx].z};
 		}
-		
 		retmesh->faces.resize(mesh->mNumFaces);
-		for(int i=0;i<retmesh->faces.size();i++){
-			retmesh->faces[i].assign(
-				mesh->mFaces[i].mIndices,
-				mesh->mFaces[i].mIndices+mesh->mFaces[i].mNumIndices);
+		for(int idx_face=0;idx_face<retmesh->faces.size();idx_face++){
+			retmesh->faces[idx_face].assign(
+				mesh->mFaces[idx_face].mIndices,
+				mesh->mFaces[idx_face].mIndices+mesh->mFaces[idx_face].mNumIndices);
 		}
+
+		// copy material informations
 		auto material = materials[mesh->mMaterialIndex];
 		int diffuse_count = material->GetTextureCount(aiTextureType_DIFFUSE);
 		if(diffuse_count > 0){
 			aiString assimp_textureName;
 			material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), assimp_textureName);
 			retmesh->material = make_shared<Material>(model_directory+"/"+assimp_textureName.data);
+		}
+	
+		// copy bone informations
+		for(int bone_idx; bone_idx<mesh->mNumBones; bone_idx++){
 		}
 	};
 	return ret;

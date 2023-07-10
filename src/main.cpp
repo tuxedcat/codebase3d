@@ -129,12 +129,12 @@ int main(){
 	try{
 		init();
 		while(!glfwWindowShouldClose(window)){
+			update();
+
 			int width, height;
 			glfwGetFramebufferSize(window, &width, &height);
 			renderer->setViewport(width, height);
 			renderer->setProjection(60.0, static_cast<double>(width) / static_cast<double>(height), 0.5, 1000.0);
-
-			update();
 			render();
 		
 			glfwSwapBuffers(window);
