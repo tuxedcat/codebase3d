@@ -30,7 +30,7 @@ Material::~Material(){
 	glDeleteTextures(1, &textureID);
 }
 
-Mesh::Mesh(Entity* owner): Component(owner), primitive_type(PrimitiveType::points), material(Material::null()){
+Mesh::Mesh(): primitive_type(PrimitiveType::points), material(Material::null()){
 }
 
 Mesh::~Mesh(){

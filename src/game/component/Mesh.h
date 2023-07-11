@@ -28,6 +28,6 @@ public:
 	std::vector<Vec3> vertices, normals, texcoord;
 	std::vector<std::vector<uint>> faces;
 	std::shared_ptr<Material> material;
-	Mesh(Entity* owner=nullptr);
+	Mesh();
 	~Mesh();
 };
