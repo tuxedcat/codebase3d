@@ -3,9 +3,9 @@
 Quaternion::Quaternion(const Mat44& mat):
 	Quaternion(
 		sqrtf(1+mat.a[0][0]+mat.a[1][1]+mat.a[2][2]),
-		(mat.a[2][1]-mat.a[1][2])/(4*w),
-		(mat.a[0][2]-mat.a[2][0])/(4*w),
-		(mat.a[1][0]-mat.a[0][1])/(4*w)){
+		(mat.a[2][1]-mat.a[1][2])/(4*sqrtf(1+mat.a[0][0]+mat.a[1][1]+mat.a[2][2])),
+		(mat.a[0][2]-mat.a[2][0])/(4*sqrtf(1+mat.a[0][0]+mat.a[1][1]+mat.a[2][2])),
+		(mat.a[1][0]-mat.a[0][1])/(4*sqrtf(1+mat.a[0][0]+mat.a[1][1]+mat.a[2][2]))){
 	//https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
 	//TODO: assert special orthogonal matrix
 	if(isnanf(w))
