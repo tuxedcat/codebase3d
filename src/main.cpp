@@ -87,22 +87,24 @@ void init(){
 	});
 	
 	auto koume = Entity::loadFromFile("models/koume/koume.fbx");
-	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
-	// auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
 	koume->scale({0.1, 0.1, 0.1});
 	koume->onUpdate=[](Entity*self, float delta_time){
 		self->rotate_acc({{0,1,0}, delta_time});
 	};
 	entity_root->adopt(koume);
 
-	auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
-	backpack->onUpdate=[](Entity*self, float delta_time){
+	auto cube = Entity::loadFromFile("models/cube/cube.obj");
+	cube->onUpdate=[](Entity*self, float delta_time){
 		static float t=0;
-		t+=delta_time/2;
-		self->rotate(Quaternion().slerp(Quaternion({0,1,0},PI/2),fmod(t,1)).normalized());
+		t+=delta_time/3;
+		self->rotate(Quaternion().slerp(Quaternion({0,1,0},PI/3),fmod(t,1)).normalized());
 	};
-	backpack->position({0,0,-5});
-	entity_root->adopt(backpack);
+	cube->position({0,0,5});
+	entity_root->adopt(cube);
+
+	// auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
+	// backpack->position({5,0,0});
+	// entity_root->adopt(backpack);
 }
 
 void render(){
