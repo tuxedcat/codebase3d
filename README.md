@@ -1,5 +1,5 @@
-# Game Engine  
-from scratch
+# Codebase3D  
+A simple game engine codebase from scratch
 
 ## Convention  
 * right-handed coordinates
