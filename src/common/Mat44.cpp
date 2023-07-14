@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "common/Mat44.h"
 #include "common/Vec3.h"
 

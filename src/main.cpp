@@ -64,15 +64,15 @@ void init(){
 	entity_root= new Entity();
 	camera = new Entity(entity_root);
 	camera->name="camera";
-	camera->position({0,100,200});
-	camera->rotate({1,0,0},-PI/8);
+	camera->position({0,10,20});
+	camera->rotate({{1,0,0},-PI/8});
 	static bool mouse_pressing=false;
 	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
 		static double prev_x=numeric_limits<double>::quiet_NaN(), prev_y=numeric_limits<double>::quiet_NaN();
 		if(mouse_pressing && isnan(prev_x)==false and isnan(prev_y)==false){
 			float dx = e.x-prev_x;
 			float dy = e.y-prev_y;
-			camera->rotate(Vec3{dy,dx,0},(fabs(dx)+fabs(dy))/100);
+			camera->rotate_acc({Vec3{dy,dx,0},(fabs(dx)+fabs(dy))/100});
 		}
 		prev_x=e.x;
 		prev_y=e.y;
@@ -86,14 +86,23 @@ void init(){
 			mouse_pressing=false;
 	});
 	
-	auto cube = Entity::loadFromFile("models/koume/koume.fbx");
+	auto koume = Entity::loadFromFile("models/koume/koume.fbx");
 	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
 	// auto cube = Entity::loadFromFile("models/backpack/backpack.obj");
-	// cube->scale({0.1, 0.1, 0.1});
-	cube->onUpdate=[](Entity*self, float delta_time){
-		self->rotate({0,1,0}, delta_time);
+	koume->scale({0.1, 0.1, 0.1});
+	koume->onUpdate=[](Entity*self, float delta_time){
+		self->rotate_acc({{0,1,0}, delta_time});
 	};
-	entity_root->adopt(cube);
+	entity_root->adopt(koume);
+
+	auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
+	backpack->onUpdate=[](Entity*self, float delta_time){
+		static float t=0;
+		t+=delta_time/2;
+		self->rotate(Quaternion().slerp(Quaternion({0,1,0},PI/2),fmod(t,1)).normalized());
+	};
+	backpack->position({0,0,-5});
+	entity_root->adopt(backpack);
 }
 
 void render(){
@@ -122,7 +131,7 @@ void update(){
 	evt::Manager<evt::MouseRelease>::patchEvents();
 	entity_root->update(delta_time);
 	prev_time = cur_time;
-	// std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
+	std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
 }
 
 int main(){

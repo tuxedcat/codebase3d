@@ -4,7 +4,10 @@
 #include <iostream>
 using namespace std;
 
-Entity* Entity::loadFromFileImpl(aiNode* node, const vector<shared_ptr<Mesh>>& meshes){
+Entity* Entity::loadFromFileImpl(
+	aiNode* node,
+	const vector<shared_ptr<Mesh>>& meshes,
+	map<aiNode*,Entity*>& mapping){
 	if(!node)
 		return nullptr;
 
@@ -21,13 +24,13 @@ Entity* Entity::loadFromFileImpl(aiNode* node, const vector<shared_ptr<Mesh>>& m
 		sqrtf(mtx.a1*mtx.a1 + mtx.a2*mtx.a2 + mtx.a3*mtx.a3),
 		sqrtf(mtx.b1*mtx.b1 + mtx.b2*mtx.b2 + mtx.b3*mtx.b3),
 		sqrtf(mtx.c1*mtx.c1 + mtx.c2*mtx.c2 + mtx.c3*mtx.c3)});
-	cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
+	// cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
 
 	for(int i=0;i<node->mNumChildren;i++){
 		// auto root=ret;
 		// while(ret->parent())
 		// 	ret=ret->parent();
-		ret->adopt(loadFromFileImpl(node->mChildren[i], meshes));
+		ret->adopt(loadFromFileImpl(node->mChildren[i], meshes, mapping));
 	}
 	// mtx.a1/=ret->scale().x;
 	// mtx.b1/=ret->scale().x;
@@ -47,7 +50,7 @@ Entity* Entity::loadFromFileImpl(aiNode* node, const vector<shared_ptr<Mesh>>& m
 	for(int idx_mesh=0;idx_mesh<node->mNumMeshes;idx_mesh++){
 		ret->meshes.emplace_back(meshes[node->mMeshes[idx_mesh]]);
 	};
-	return ret;
+	return mapping[node]=ret;
 }
 
 Entity* Entity::loadFromFile(const std::string& model_path){
@@ -60,6 +63,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 		// |aiProcess_SortByPType
 		|aiProcess_FlipUVs
 		//aiProcess_SplitLargeMeshes, aiProcess_OptimizeMeshes 
+		|aiProcess_PopulateArmatureData
 	);
 	if(scene==nullptr)
 		throw std::string(importer.GetErrorString());
@@ -75,6 +79,8 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 			material_src->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), assimp_textureName);
 			auto model_directory = model_path.substr(0,model_path.find_last_of('/'));
 			materials.emplace_back(make_shared<Material>(model_directory+"/"+assimp_textureName.data));
+		}else{
+			materials.emplace_back(make_shared<Material>());
 		}
 	}
 
@@ -89,6 +95,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 		mesh->vertices.resize(mesh_src->mNumVertices);
 		mesh->normals.resize(mesh_src->mNumVertices);
 		mesh->texcoord.resize(mesh_src->mNumVertices);
+		mesh->bones_per_vertex.resize(mesh_src->mNumVertices);
 		for(int idx_vtx=0;idx_vtx<mesh->vertices.size();idx_vtx++){
 			assert(mesh_src->HasNormals() and mesh_src->mTextureCoords[0]);
 			mesh->vertices[idx_vtx]={
@@ -113,14 +120,26 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 
 		// copy material informations
 		mesh->material = materials[mesh_src->mMaterialIndex];
-	
-		// // copy bone informations
-		// for(int bone_idx; bone_idx<mesh->mNumBones; bone_idx++){
-		// 	mesh->mBones[bone_idx]->mWeights->
-		// }
 	}
 
-	return loadFromFileImpl(scene->mRootNode, meshes);
+	map<aiNode*,Entity*> mapping;
+	auto ret = loadFromFileImpl(scene->mRootNode, meshes, mapping);
+	for(int idx_mesh=0;idx_mesh<scene->mNumMeshes;idx_mesh++){
+		// copy bone informations
+		auto& mesh_src = scene->mMeshes[idx_mesh];
+		for(int bone_idx=0; bone_idx<mesh_src->mNumBones; bone_idx++){
+			const auto& bone_src = mesh_src->mBones[bone_idx];
+			for(int idx_weight=0;idx_weight<bone_src->mNumWeights;idx_weight++){
+				const auto& weight_src = bone_src->mWeights;
+				bone_src->mOffsetMatrix;
+				
+				// mesh->bones_per_vertex[weight_src->mVertexId].emplace_back(make_shared<Bone>(..~));
+				// bone_src->mArmature
+			}
+		}
+	}
+	// scene->mAnimations[0]->
+	return ret;
 }
 
 Entity::~Entity(){

@@ -2,8 +2,9 @@
 #include <list>
 #include <vector>
 #include <string>
-#include <assert.h>
+#include <map>
 #include <memory>
+#include <assert.h>
 #include "common/Vec3.h"
 #include "common/Quaternion.h"
 #include "render/Renderer.h"
@@ -30,18 +31,15 @@ public:
 	}
 	~Entity();
 
-	Vec3 position()const{return _position;}
-	Quaternion rotate()const{return _rotate;}
-	Vec3 scale()const{return _scale;}
-	void position(const Vec3& v){_position=v;}
-	void rotate(Vec3 axis, float angle){
-		axis.normalize();
-		auto sin_ha = sin(angle/2);
-		auto cos_ha = cos(angle/2);
-		_rotate=(Quaternion(cos_ha, axis.x*sin_ha, axis.y*sin_ha, axis.z*sin_ha)*_rotate).normalized();
-	}
-	void setRotate(const Quaternion& q){ _rotate=q; }
-	void scale(const Vec3& v){_scale=v;}
+	Vec3 position()const{ return _position; }
+	Quaternion rotate()const{ return _rotate; }
+	Vec3 scale()const{ return _scale; }
+	void position(const Vec3& v){ _position=v; }
+	void rotate(const Quaternion& q){ _rotate=q; }
+	void scale(const Vec3& v){ _scale=v; }
+	void position_acc(const Vec3& v){ _position+=v; }
+	void rotate_acc(Quaternion q){ _rotate=q*_rotate; }
+	void scale_acc(const Vec3& v){ _scale*=v; }
 
 	Entity* parent()const{return _parent;}
 	void adopt(Entity* child){
@@ -103,5 +101,8 @@ private:
 	Entity* _parent;
 	std::list<Entity*> children;
 	std::list<std::shared_ptr<Mesh>> meshes;
-	static Entity* loadFromFileImpl(aiNode* node, const std::vector<std::shared_ptr<Mesh>>& meshes);
+	static Entity* loadFromFileImpl(
+		aiNode* node,
+		const std::vector<std::shared_ptr<Mesh>>& meshes,
+		std::map<aiNode*,Entity*>& mapping);
 };
