@@ -6,6 +6,7 @@
 #include <GL/gl.h>
 #include "common/Vec3.h"
 #include "common/Mat44.h"
+#include "common/Quaternion.h"
 #include "game/component/Component.h"
 #include "render/Renderer.h"
 
@@ -24,16 +25,32 @@ private:
 };
 
 class Bone{
-	
+public:
+	Mat44 offset;
+	std::vector<std::pair<float,Vec3>> positions;
+	std::vector<std::pair<float,Quaternion>> rotations;
+	std::vector<std::pair<float,Vec3>> scales;
+	Bone(){
+		// throw "It should be implemented!!!";
+	}
+	Bone(const std::string& name){
+
+	}
 };
+struct BoneInfluence{
+	float weight=0;
+	Bone* bone=nullptr;
+};
+const int MAX_BONE_INFLUENCE=8;
 
 class Mesh:public Component{
 public:
 	PrimitiveType primitive_type;
 	std::vector<Vec3> vertices, normals, texcoord;
-	std::vector<std::list<std::shared_ptr<Bone>>> bones_per_vertex;
 	std::vector<std::vector<uint>> faces;
 	std::shared_ptr<Material> material;
+	std::vector<Bone> bones;
+	std::vector<std::array<BoneInfluence,MAX_BONE_INFLUENCE>> bone_influences;
 	Mesh();
 	~Mesh();
 };

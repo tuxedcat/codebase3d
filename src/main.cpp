@@ -86,8 +86,8 @@ void init(){
 			mouse_pressing=false;
 	});
 	
-	auto koume = Entity::loadFromFile("models/koume/koume.fbx");
-	koume->scale({0.1, 0.1, 0.1});
+	auto koume = Entity::loadFromFile("models/warwoman/IDLE@charecter.fbx");
+	koume->scale({0.05, 0.05, 0.05});
 	koume->onUpdate=[](Entity*self, float delta_time){
 		self->rotate_acc({{0,1,0}, delta_time});
 	};

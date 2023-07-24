@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <list>
 #include <vector>
 #include <string>
@@ -8,9 +9,20 @@
 #include "common/Vec3.h"
 #include "common/Quaternion.h"
 #include "render/Renderer.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+
+struct Entity;
+struct EntityAnimFrames{
+	Entity* node;
+	std::vector<std::pair<float,Vec3>> positions;
+	std::vector<std::pair<float,Quaternion>> rotations;
+	std::vector<std::pair<float,Vec3>> scales;
+};
+struct EntityAnim{
+	std::string name;
+	float duration;
+	float ticksPerSecond;
+	std::vector<EntityAnimFrames> channels;
+};
 
 struct Mesh;
 struct Entity{
@@ -94,6 +106,8 @@ public:
 	void update(float delta_time);
 
 	void(*onUpdate)(Entity* self, float delta_time)=nullptr;
+
+	void addMesh(const std::shared_ptr<Mesh>& mesh){meshes.emplace_back(mesh);}
 private:
 	Vec3 _position;
 	Quaternion _rotate;
@@ -101,8 +115,5 @@ private:
 	Entity* _parent;
 	std::list<Entity*> children;
 	std::list<std::shared_ptr<Mesh>> meshes;
-	static Entity* loadFromFileImpl(
-		aiNode* node,
-		const std::vector<std::shared_ptr<Mesh>>& meshes,
-		std::map<aiNode*,Entity*>& mapping);
+	std::list<EntityAnim> anims;
 };

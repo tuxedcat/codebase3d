@@ -7,3 +7,15 @@ A simple game engine codebase from scratch
 
 ## Known Issue  
 Memory Leak https://github.com/glfw/glfw/issues/2093
+
+## TODO
+* Model animation
+  - Draw bone tree(Draw line from bone to its parent)
+	- CPU Skinning
+	- GPU Skinning
+* Use shader instead fixed function pipeline (https://learnopengl.com/Lighting/Basic-Lighting)
+* GPU skinning(https://community.khronos.org/t/skinning-on-the-gpu-vs-the-cpu/73169/8)
+* Camera z axis rotation issue (adjust quaternion roll axis to zero)
+* Dirty flag
+* ECS https://en.wikipedia.org/wiki/Entity_component_system
+* Textbox, show FPS 

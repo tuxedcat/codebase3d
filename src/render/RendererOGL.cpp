@@ -53,15 +53,21 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 
 	for(const auto&req:render_q){
 		glLoadMatrixf((const float*)req.to_world.transposed().a);
-		if(req.textureID!=-1)
-			glBindTexture(GL_TEXTURE_2D, req.textureID);
 		glBegin(PrimitiveType2GL(req.primitive_type));
-		for(auto face:req.faces){
-			for(auto i:face){
-				if(req.textureID!=-1)
-					glTexCoord2f(req.texcoord[i].x,req.texcoord[i].y);
-				glNormal3f(req.normals[i].x,req.normals[i].y,req.normals[i].z);
-				glVertex3f(req.vertices[i].x,req.vertices[i].y,req.vertices[i].z);
+		if(req.primitive_type==PrimitiveType::lines){
+			glColor3bv((GLbyte*)&req.textureID);
+			for(auto vtx:req.vertices)
+				glVertex3f(vtx.x,vtx.y,vtx.z);
+		}else{
+			if(req.textureID!=-1)
+				glBindTexture(GL_TEXTURE_2D, req.textureID);
+			for(auto face:req.faces){
+				for(auto i:face){
+					if(req.textureID!=-1)
+						glTexCoord2f(req.texcoord[i].x,req.texcoord[i].y);
+					glNormal3f(req.normals[i].x,req.normals[i].y,req.normals[i].z);
+					glVertex3f(req.vertices[i].x,req.vertices[i].y,req.vertices[i].z);
+				}
 			}
 		}
 		glEnd();
