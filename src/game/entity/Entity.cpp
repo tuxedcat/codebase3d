@@ -226,7 +226,7 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 	render_q.emplace_back(
 		parent2world*local2parent(),
 		PrimitiveType::lines,
-		std::vector<Vec3>{{0,0,0},{0.1,0,0}, {0.1,0,0},{0.1,0.1,0}, {0.1,0.1,0},{0,0.1,0}, {0,0.1,0},{0,0,0}},
+		std::vector<Vec3>{{0,0,0},{1,0,0}, {1,0,0},{1,1,0}, {1,1,0},{0,1,0}, {0,1,0},{0,0,0}},
 		std::vector<Vec3>{},
 		std::vector<Vec3>{},
 		std::vector<std::vector<uint>>{},
