@@ -26,15 +26,8 @@ private:
 
 class Bone{
 public:
-	Mat44 offset;
-	std::vector<std::pair<float,Vec3>> positions;
-	std::vector<std::pair<float,Quaternion>> rotations;
-	std::vector<std::pair<float,Vec3>> scales;
-	Bone(){
-		// throw "It should be implemented!!!";
-	}
-	Bone(const std::string& name){
-
+	Mat44 offset;//local to bone
+	Bone(Mat44 offset):offset(offset){
 	}
 };
 struct BoneInfluence{

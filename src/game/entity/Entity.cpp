@@ -124,18 +124,16 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 		// copy material informations
 		mesh->material = materials[mesh_src->mMaterialIndex];
 
-		mesh->bones.resize(mesh_src->mNumBones);
 		mesh->bone_influences.resize(mesh_src->mNumVertices);
 		for(int bone_idx=0; bone_idx<mesh_src->mNumBones; bone_idx++){
 			const auto& bone_src = mesh_src->mBones[bone_idx];
-			auto& bone = mesh->bones[bone_idx];
 			const auto& offset_src = bone_src->mOffsetMatrix;
-			bone.offset = {
+			auto& bone = mesh->bones.emplace_back(Mat44{
 				offset_src.a1, offset_src.a2, offset_src.a3, offset_src.a4,
 				offset_src.b1, offset_src.b2, offset_src.b3, offset_src.b4,
 				offset_src.c1, offset_src.c2, offset_src.c3, offset_src.c4,
 				offset_src.d1, offset_src.d2, offset_src.d3, offset_src.d4,
-			};
+			});
 			for(int idx_weight=0;idx_weight<bone_src->mNumWeights;idx_weight++){
 				int target_vertex = bone_src->mWeights[idx_weight].mVertexId;
 				float weight = bone_src->mWeights[idx_weight].mWeight;
@@ -157,18 +155,16 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 	auto ret = loadFromFileImpl(scene->mRootNode, meshes, mapping);
 	if(scene->mAnimations){
 		const auto& anim_src=scene->mAnimations[0];
-		ret->anims.emplace_back(
-			string(anim_src->mName.C_Str()),
-			float(anim_src->mDuration),
-			float(anim_src->mTicksPerSecond)
-		);
 		for(int i=0;i<anim_src->mNumChannels;i++){
 			const auto& channel_src=anim_src->mChannels[i];
-			ret->anims.back().channels.emplace_back(
-				mapping[channel_src->mNodeName.C_Str()]
+			auto& bone = mapping[channel_src->mNodeName.C_Str()];
+			bone->anims.emplace_back(
+				string(anim_src->mName.C_Str()),
+				float(anim_src->mDuration),
+				float(anim_src->mTicksPerSecond)
 			);
 			for(int j=0;j<channel_src->mNumPositionKeys;j++){
-				ret->anims.back().channels.back().positions.emplace_back(
+				bone->anims.back().positions.emplace_back(
 					channel_src->mPositionKeys[j].mTime,
 					Vec3{
 						channel_src->mPositionKeys[j].mValue.x,
@@ -178,7 +174,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				);
 			}
 			for(int j=0;j<channel_src->mNumRotationKeys;j++){
-				ret->anims.back().channels.back().rotations.emplace_back(
+				bone->anims.back().rotations.emplace_back(
 					channel_src->mRotationKeys[j].mTime,
 					Quaternion{
 						channel_src->mRotationKeys[j].mValue.w,
@@ -189,7 +185,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				);
 			}
 			for(int j=0;j<channel_src->mNumScalingKeys;j++){
-				ret->anims.back().channels.back().scales.emplace_back(
+				bone->anims.back().scales.emplace_back(
 					channel_src->mScalingKeys[j].mTime,
 					Vec3{
 						channel_src->mScalingKeys[j].mValue.x,
@@ -238,6 +234,37 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 }
 
 void Entity::update(float delta_time){
+	static float elapsed=0.5f;
+	// static float elapsed=0.0f;
+	// elapsed+=delta_time;
+	if(anims.size()){
+		
+		if(auto it = upper_bound(anims.back().positions.begin(),anims.back().positions.end(),elapsed,[](float time, const auto& keyframe){
+				return time < keyframe.first;
+			});it!=anims.back().positions.begin() and it!=anims.back().positions.end()){
+			auto [t0,v0] = *prev(it);
+			auto [t1,v1] = *it;
+			position(v0.lerp(v1, (elapsed-t0)/(t1-t0)));
+		}
+		
+		// if(auto it = upper_bound(anims.back().rotations.begin(),anims.back().rotations.end(),elapsed,[](float time, const auto& keyframe){
+		// 		return time < keyframe.first;
+		// 	});it!=anims.back().rotations.begin() and it!=anims.back().rotations.end()){
+		// 	auto [t0,q0] = *prev(it);
+		// 	auto [t1,q1] = *it;
+		// 	rotate(q0.slerp(q1, (elapsed-t0)/(t1-t0)).normalized());
+		// }
+		
+		if(auto it = upper_bound(anims.back().scales.begin(),anims.back().scales.end(),elapsed,[](float time, const auto& keyframe){
+				return time < keyframe.first;
+			});it!=anims.back().scales.begin() and it!=anims.back().scales.end()){
+			auto [t0,v0] = *prev(it);
+			auto [t1,v1] = *it;
+			scale(v0.lerp(v1, (elapsed-t0)/(t1-t0)));
+		}
+	}
+
+
 	if(onUpdate)
 		onUpdate(this, delta_time);
 	for(auto i:children)

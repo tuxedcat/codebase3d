@@ -49,6 +49,7 @@ public:
 	void normalize(){ *this=normalized(); }
 	bool isOrtho(const Vec3& o)const{ return float_zero(this->dot(o)); }
 	bool isUnit()const{ return float_eq(lensq(), 1); }
+	Vec3 lerp(const Vec3& dest, float coef){ return *this + (dest-*this)*coef; }
 };
 
 #include <ostream>

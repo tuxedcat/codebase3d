@@ -10,18 +10,13 @@
 #include "common/Quaternion.h"
 #include "render/Renderer.h"
 
-struct Entity;
-struct EntityAnimFrames{
-	Entity* node;
-	std::vector<std::pair<float,Vec3>> positions;
-	std::vector<std::pair<float,Quaternion>> rotations;
-	std::vector<std::pair<float,Vec3>> scales;
-};
 struct EntityAnim{
 	std::string name;
 	float duration;
 	float ticksPerSecond;
-	std::vector<EntityAnimFrames> channels;
+	std::vector<std::pair<float,Vec3>> positions;
+	std::vector<std::pair<float,Quaternion>> rotations;
+	std::vector<std::pair<float,Vec3>> scales;
 };
 
 struct Mesh;
