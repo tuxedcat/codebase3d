@@ -47,4 +47,7 @@ add_subdirectory(assimp)
 include_directories(${CMAKE_SOURCE_DIR}/assimp/include)
 link_libraries(assimp)
 
+add_subdirectory(glm)
+include_directories(${CMAKE_SOURCE_DIR}/glm)
+
 add_subdirectory(src)
