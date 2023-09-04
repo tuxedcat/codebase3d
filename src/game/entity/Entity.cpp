@@ -4,6 +4,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "glm/gtx/matrix_decompose.hpp"
 using namespace std;
 
 static Entity* loadFromFileImpl(
@@ -16,16 +17,31 @@ static Entity* loadFromFileImpl(
 	auto ret = new Entity;	
 	ret->name = node->mName.C_Str();
 	auto mtx = node->mTransformation;
+
+	glm::mat4 transformation; // your transformation matrix.
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+
+	// Workaround
 	ret->position({mtx.a4,mtx.b4,mtx.c4});
 	mtx.a4=mtx.b4=mtx.c4=0;
-	// ret->scale({
-	// 	sqrtf(mtx.a1*mtx.a1 + mtx.b1*mtx.b1 + mtx.c1*mtx.c1),
-	// 	sqrtf(mtx.a2*mtx.a2 + mtx.b2*mtx.b2 + mtx.c2*mtx.c2),
-	// 	sqrtf(mtx.a3*mtx.a3 + mtx.b3*mtx.b3 + mtx.c3*mtx.c3)});
+
+	transformation[0][0]=mtx.a1; transformation[0][1]=mtx.a2; transformation[0][2]=mtx.a3; transformation[0][3]=mtx.a4;
+	transformation[1][0]=mtx.b1; transformation[1][1]=mtx.b2; transformation[1][2]=mtx.b3; transformation[1][3]=mtx.b4;
+	transformation[2][0]=mtx.c1; transformation[2][1]=mtx.c2; transformation[2][2]=mtx.c3; transformation[2][3]=mtx.c4;
+	transformation[3][0]=mtx.d1; transformation[3][1]=mtx.d2; transformation[3][2]=mtx.d3; transformation[3][3]=mtx.d4;
+	std::cout << glm::decompose(transformation, scale, rotation, translation, skew, perspective) << std::endl;
+	std::cout << translation.x<<' '<<translation.y<<' '<<translation.z << std::endl;
+	std::cout << mtx.a4 <<' '<<mtx.b4<<' '<<mtx.c4 << std::endl;
+
 	ret->scale({
-		sqrtf(mtx.a1*mtx.a1 + mtx.a2*mtx.a2 + mtx.a3*mtx.a3),
-		sqrtf(mtx.b1*mtx.b1 + mtx.b2*mtx.b2 + mtx.b3*mtx.b3),
-		sqrtf(mtx.c1*mtx.c1 + mtx.c2*mtx.c2 + mtx.c3*mtx.c3)});
+		scale.x,
+		scale.y,
+		scale.z});
+	ret->rotate({rotation.w,rotation.x,rotation.y,rotation.z});
 	// cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
 
 	for(int i=0;i<node->mNumChildren;i++){

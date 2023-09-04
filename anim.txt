@@ -1,0 +1,4 @@
+anim = proj*view*model(=ancestors*node)*bone_offset
+
+
+glm으로 migrate하고, 하던것은 matrix_decompose사용하면 해결될듯함.
