@@ -218,9 +218,9 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 			mesh->material->getTextureID());
 	}
 	render_q.emplace_back(
-		parent2world*local2parent(),
+		parent2world,
 		PrimitiveType::lines,
-		std::vector<Vec3>{{0,0,0},{2,0,0}, {2,0,0},{2,2,0}, {2,2,0},{0,2,0}, {0,2,0},{0,0,0}},
+		std::vector<Vec3>{{0,0,0},position()},
 		std::vector<Vec3>{},
 		std::vector<Vec3>{},
 		std::vector<std::vector<uint>>{},
