@@ -92,22 +92,22 @@ void init(){
 	};
 	entity_root->adopt(dv);
 	
-	auto koume = Entity::loadFromFile("models/koume/koume.fbx");
-	koume->position({5,5,0});
-	koume->scale({0.05, 0.05, 0.05});
-	koume->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc({{0,1,0}, delta_time});
-	};
-	entity_root->adopt(koume);
+	// auto koume = Entity::loadFromFile("models/koume/koume.fbx");
+	// koume->position({5,5,0});
+	// koume->scale({0.05, 0.05, 0.05});
+	// koume->onUpdate=[](Entity*self, float delta_time){
+	// 	self->rotate_acc({{0,1,0}, delta_time});
+	// };
+	// entity_root->adopt(koume);
 
-	auto cube = Entity::loadFromFile("models/cube/cube.obj");
-	cube->onUpdate=[](Entity*self, float delta_time){
-		static float t=0;
-		t+=delta_time/3;
-		self->rotate(Quaternion().slerp(Quaternion({0,1,0},PI/3),fmod(t,1)).normalized());
-	};
-	cube->position({0,0,5});
-	entity_root->adopt(cube);
+	// auto cube = Entity::loadFromFile("models/cube/cube.obj");
+	// cube->onUpdate=[](Entity*self, float delta_time){
+	// 	static float t=0;
+	// 	t+=delta_time/3;
+	// 	self->rotate(Quaternion().slerp(Quaternion({0,1,0},PI/3),fmod(t,1)).normalized());
+	// };
+	// cube->position({0,0,5});
+	// entity_root->adopt(cube);
 
 	// auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
 	// backpack->position({5,0,0});

@@ -33,21 +33,15 @@ static Entity* loadFromFileImpl(
 	transformation[1][0]=mtx.b1; transformation[1][1]=mtx.b2; transformation[1][2]=mtx.b3; transformation[1][3]=mtx.b4;
 	transformation[2][0]=mtx.c1; transformation[2][1]=mtx.c2; transformation[2][2]=mtx.c3; transformation[2][3]=mtx.c4;
 	transformation[3][0]=mtx.d1; transformation[3][1]=mtx.d2; transformation[3][2]=mtx.d3; transformation[3][3]=mtx.d4;
-	std::cout << glm::decompose(transformation, scale, rotation, translation, skew, perspective) << std::endl;
-	std::cout << translation.x<<' '<<translation.y<<' '<<translation.z << std::endl;
-	std::cout << mtx.a4 <<' '<<mtx.b4<<' '<<mtx.c4 << std::endl;
+	glm::decompose(transformation, scale, rotation, translation, skew, perspective);
 
 	ret->scale({
 		scale.x,
 		scale.y,
 		scale.z});
 	ret->rotate({rotation.w,rotation.x,rotation.y,rotation.z});
-	// cout<<ret->name<<' '<<ret->position()<<' '<<ret->scale()<<endl;
 
 	for(int i=0;i<node->mNumChildren;i++){
-		// auto root=ret;
-		// while(ret->parent())
-		// 	ret=ret->parent();
 		ret->adopt(loadFromFileImpl(node->mChildren[i], meshes, mapping));
 	}
 
@@ -148,8 +142,6 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				mesh->bone_influences[target_vertex][influence_idx].bone=&bone;
 				mesh->bone_influences[target_vertex][influence_idx].weight=weight;
 			}
-			cout<<"BoneName: "<<bone_src->mName.C_Str()<<endl;
-			// cout<<"NodeName: "<<bone_src->mNode->mName.C_Str()<<endl; == bone name
 		}
 	}
 
