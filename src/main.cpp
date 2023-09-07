@@ -86,12 +86,11 @@ void init(){
 			mouse_pressing=false;
 	});
 	
-	auto ww = Entity::loadFromFile("models/warwoman/IDLE@charecter.fbx");
-	ww->scale({0.05, 0.05, 0.05});
-	ww->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc({{0,1,0}, delta_time});
+	auto dv = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
+	dv->scale({0.05, 0.05, 0.05});
+	dv->onUpdate=[](Entity*self, float delta_time){
 	};
-	entity_root->adopt(ww);
+	entity_root->adopt(dv);
 	
 	auto koume = Entity::loadFromFile("models/koume/koume.fbx");
 	koume->position({5,5,0});

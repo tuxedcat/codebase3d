@@ -50,20 +50,6 @@ static Entity* loadFromFileImpl(
 		// 	ret=ret->parent();
 		ret->adopt(loadFromFileImpl(node->mChildren[i], meshes, mapping));
 	}
-	// mtx.a1/=ret->scale().x;
-	// mtx.b1/=ret->scale().x;
-	// mtx.c1/=ret->scale().x;
-	// mtx.a2/=ret->scale().y;
-	// mtx.b2/=ret->scale().y;
-	// mtx.c2/=ret->scale().y;
-	// mtx.a3/=ret->scale().z;
-	// mtx.b3/=ret->scale().z;
-	// mtx.c3/=ret->scale().z;
-	// ret->setRotate(Quaternion({
-	// 	mtx.a1,mtx.a2,mtx.a3,mtx.a4,
-	// 	mtx.b1,mtx.b2,mtx.b3,mtx.b4,
-	// 	mtx.c1,mtx.c2,mtx.c3,mtx.c4,
-	// 	mtx.d1,mtx.d2,mtx.d3,mtx.d4}));
 
 	for(int idx_mesh=0;idx_mesh<node->mNumMeshes;idx_mesh++){
 		ret->addMesh(meshes[node->mMeshes[idx_mesh]]);
@@ -242,7 +228,7 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 	render_q.emplace_back(
 		parent2world*local2parent(),
 		PrimitiveType::lines,
-		std::vector<Vec3>{{0,0,0},{1,0,0}, {1,0,0},{1,1,0}, {1,1,0},{0,1,0}, {0,1,0},{0,0,0}},
+		std::vector<Vec3>{{0,0,0},{2,0,0}, {2,0,0},{2,2,0}, {2,2,0},{0,2,0}, {0,2,0},{0,0,0}},
 		std::vector<Vec3>{},
 		std::vector<Vec3>{},
 		std::vector<std::vector<uint>>{},
@@ -250,9 +236,8 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 }
 
 void Entity::update(float delta_time){
-	static float elapsed=0.5f;
-	// static float elapsed=0.0f;
-	// elapsed+=delta_time;
+	static float elapsed=0.0f;
+	elapsed+=delta_time;
 	if(anims.size()){
 		
 		if(auto it = upper_bound(anims.back().positions.begin(),anims.back().positions.end(),elapsed,[](float time, const auto& keyframe){
@@ -263,13 +248,13 @@ void Entity::update(float delta_time){
 			position(v0.lerp(v1, (elapsed-t0)/(t1-t0)));
 		}
 		
-		// if(auto it = upper_bound(anims.back().rotations.begin(),anims.back().rotations.end(),elapsed,[](float time, const auto& keyframe){
-		// 		return time < keyframe.first;
-		// 	});it!=anims.back().rotations.begin() and it!=anims.back().rotations.end()){
-		// 	auto [t0,q0] = *prev(it);
-		// 	auto [t1,q1] = *it;
-		// 	rotate(q0.slerp(q1, (elapsed-t0)/(t1-t0)).normalized());
-		// }
+		if(auto it = upper_bound(anims.back().rotations.begin(),anims.back().rotations.end(),elapsed,[](float time, const auto& keyframe){
+				return time < keyframe.first;
+			});it!=anims.back().rotations.begin() and it!=anims.back().rotations.end()){
+			auto [t0,q0] = *prev(it);
+			auto [t1,q1] = *it;
+			rotate(q0.slerp(q1, (elapsed-t0)/(t1-t0)).normalized());
+		}
 		
 		if(auto it = upper_bound(anims.back().scales.begin(),anims.back().scales.end(),elapsed,[](float time, const auto& keyframe){
 				return time < keyframe.first;
