@@ -10,8 +10,6 @@ Memory Leak https://github.com/glfw/glfw/issues/2093
 
 ## TODO
 * Model animation
-  - Draw bone tree(Draw line from bone to its parent)
-	- CPU Skinning
 	- GPU Skinning
 * Use shader instead fixed function pipeline (https://learnopengl.com/Lighting/Basic-Lighting)
 * GPU skinning(https://community.khronos.org/t/skinning-on-the-gpu-vs-the-cpu/73169/8)

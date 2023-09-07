@@ -116,7 +116,7 @@ public:
 		return ret;
 	}
 
-	void draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
+	void draw(const Mat44& world2camera, Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
 	void update(float delta_time);
 
 	void(*onUpdate)(Entity* self, float delta_time)=nullptr;

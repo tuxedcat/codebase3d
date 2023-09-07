@@ -205,9 +205,9 @@ Entity::~Entity(){
 		delete child;
 }
 
-void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const{
+void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<RenderRequest>& render_q)const{
 	for(auto i: children){
-		i->draw(parent2world*local2parent(), render_q);
+		i->draw(world2camera, parent2world*local2parent(), render_q);
 	}
 
 	for(auto mesh:meshes){
@@ -223,7 +223,7 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 			normals_cur[i]=mesh->normals[i];
 		}
 		render_q.emplace_back(
-			parent2world*local2parent(),
+			world2camera*local2parent(),
 			mesh->primitive_type,
 			vertices_cur,
 			normals_cur,
@@ -231,15 +231,15 @@ void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const
 			mesh->faces,
 			mesh->material->getTextureID());
 	}
-	//bone tree
-	render_q.emplace_back(
-		parent2world,
-		PrimitiveType::lines,
-		std::vector<Vec3>{{0,0,0},position()},
-		std::vector<Vec3>{},
-		std::vector<Vec3>{},
-		std::vector<std::vector<uint>>{},
-		unsigned(-1));
+	// //bone tree
+	// render_q.emplace_back(
+	// 	world2camera*parent2world,
+	// 	PrimitiveType::lines,
+	// 	std::vector<Vec3>{{0,0,0},position()},
+	// 	std::vector<Vec3>{},
+	// 	std::vector<Vec3>{},
+	// 	std::vector<std::vector<uint>>{},
+	// 	unsigned(-1));
 }
 
 void Entity::update(float delta_time){
