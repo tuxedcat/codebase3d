@@ -83,6 +83,8 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 		}
 	}
 
+	map<string,Bone*> name2bone;
+	map<string,Entity*> name2bonenode;
 	vector<shared_ptr<Mesh>> meshes;
 	for(int idx_mesh=0;idx_mesh<scene->mNumMeshes;idx_mesh++){
 		const auto& mesh_src = scene->mMeshes[idx_mesh];
@@ -120,16 +122,20 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 		// copy material informations
 		mesh->material = materials[mesh_src->mMaterialIndex];
 
+		// copy bone informations
 		mesh->bone_influences.resize(mesh_src->mNumVertices);
+		mesh->bones.resize(mesh_src->mNumBones);//Allocate memory before emplace_back to prevent dangling pointer.
 		for(int bone_idx=0; bone_idx<mesh_src->mNumBones; bone_idx++){
 			const auto& bone_src = mesh_src->mBones[bone_idx];
 			const auto& offset_src = bone_src->mOffsetMatrix;
-			auto& bone = mesh->bones.emplace_back(Mat44{
+			auto& bone = mesh->bones[bone_idx];
+			bone.offset={
 				offset_src.a1, offset_src.a2, offset_src.a3, offset_src.a4,
 				offset_src.b1, offset_src.b2, offset_src.b3, offset_src.b4,
 				offset_src.c1, offset_src.c2, offset_src.c3, offset_src.c4,
 				offset_src.d1, offset_src.d2, offset_src.d3, offset_src.d4,
-			});
+			};
+			bone.name=bone_src->mName.C_Str();
 			for(int idx_weight=0;idx_weight<bone_src->mNumWeights;idx_weight++){
 				int target_vertex = bone_src->mWeights[idx_weight].mVertexId;
 				float weight = bone_src->mWeights[idx_weight].mWeight;
@@ -142,16 +148,17 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				mesh->bone_influences[target_vertex][influence_idx].bone=&bone;
 				mesh->bone_influences[target_vertex][influence_idx].weight=weight;
 			}
+			name2bone[bone.name]=&bone;
 		}
 	}
 
-	map<string,Entity*> mapping;
-	auto ret = loadFromFileImpl(scene->mRootNode, meshes, mapping);
+	auto ret = loadFromFileImpl(scene->mRootNode, meshes, name2bonenode);
 	if(scene->mAnimations){
 		const auto& anim_src=scene->mAnimations[0];
 		for(int i=0;i<anim_src->mNumChannels;i++){
 			const auto& channel_src=anim_src->mChannels[i];
-			auto& bone = mapping[channel_src->mNodeName.C_Str()];
+			auto& bone = name2bonenode[channel_src->mNodeName.C_Str()];
+			name2bone[bone->name]->node=bone;
 			bone->anims.emplace_back(
 				string(anim_src->mName.C_Str()),
 				float(anim_src->mDuration),
@@ -199,24 +206,32 @@ Entity::~Entity(){
 }
 
 void Entity::draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const{
-	for(auto i: children)
+	for(auto i: children){
 		i->draw(parent2world*local2parent(), render_q);
+	}
 
 	for(auto mesh:meshes){
 		vector<Vec3> vertices_cur(mesh->vertices.size()), normals_cur(mesh->vertices.size());
 		for(int i=0;i<mesh->vertices.size();i++){
-			vertices_cur.emplace_back(mesh->vertices[i]);
-			normals_cur.emplace_back(mesh->normals[i]);
+			Vec3 vtx_skinned;
+			for(int j=0;j<MAX_BONE_INFLUENCE;j++){
+				if(mesh->bone_influences[i][j].weight!=0)
+					vtx_skinned += mesh->bone_influences[i][j].bone->node->local2world()*mesh->bone_influences[i][j].bone->offset * mesh->vertices[i] * mesh->bone_influences[i][j].weight;
+			}
+			vertices_cur[i]=vtx_skinned;
+			//TODO: normal
+			normals_cur[i]=mesh->normals[i];
 		}
 		render_q.emplace_back(
 			parent2world*local2parent(),
 			mesh->primitive_type,
-			mesh->vertices,
-			mesh->normals,
+			vertices_cur,
+			normals_cur,
 			mesh->texcoord,
 			mesh->faces,
 			mesh->material->getTextureID());
 	}
+	//bone tree
 	render_q.emplace_back(
 		parent2world,
 		PrimitiveType::lines,

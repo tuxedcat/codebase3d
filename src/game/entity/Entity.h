@@ -97,6 +97,25 @@ public:
 		return mscale*mrotate*mposition;
 	}
 
+	Mat44 local2world()const{
+		auto ret=Mat44::identity();
+		auto node=this;
+		while(node){
+			ret=node->local2parent()*ret;
+			node=node->parent();
+		}
+		return ret;
+	}
+	Mat44 world2local()const{
+		auto ret=Mat44::identity();
+		auto node=this;
+		while(node){
+			ret=ret*node->parent2local();
+			node=node->parent();
+		}
+		return ret;
+	}
+
 	void draw(Mat44 parent2world, std::vector<RenderRequest>& render_q)const;
 	void update(float delta_time);
 

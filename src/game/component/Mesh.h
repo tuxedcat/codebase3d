@@ -24,11 +24,12 @@ private:
 	GLuint textureID;
 };
 
+class Entity;
 class Bone{
 public:
-	Mat44 offset;//local to bone
-	Bone(Mat44 offset):offset(offset){
-	}
+	Mat44 offset;
+	Entity *node;
+	std::string name;
 };
 struct BoneInfluence{
 	float weight=0;

@@ -1,4 +1,5 @@
-anim = proj*view*model(=ancestors*node)*bone_offset
-
+mOffsetMatrix(=inverse bind pose matrix)의 의미를 이해못해서 해멨는데, 결국 다음과 같다.
+bone node는 처음에 bind pose로 설정되있다. 그리고 mesh도 bind pose기준으로 매칭되어있다. 그걸 animate된 bone node위치로 변환해야 하는데, 그래서 mesh의 정점도 영향받는 bone의 mOffsetMatrix(inverse bind pose)로 model 원점으로 보낸다음, animated된 bone node의 local2world transfrom을 곱해주면 원하는 스키닝 위치가 나온다.
+참고자료: https://yadiyasheng.medium.com/skeletal-animation-and-gpu-skinning-c99b30eb2ca2
 
 glm으로 migrate하고, 하던것은 matrix_decompose사용하면 해결될듯함.

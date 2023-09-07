@@ -87,7 +87,8 @@ void init(){
 	});
 	
 	auto dv = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
-	dv->scale({0.05, 0.05, 0.05});
+	dv->scale({0.1, 0.1, 0.1});
+	dv->position({10,-1,0});
 	dv->onUpdate=[](Entity*self, float delta_time){
 	};
 	entity_root->adopt(dv);
@@ -117,16 +118,8 @@ void init(){
 void render(){
 	if(!camera)
 		throw "No camera selected";
-	auto world2camera=Mat44::identity();
-	world2camera=world2camera*camera->parent2local();
-	auto parent_iter=camera->parent();
-	while(parent_iter){
-		world2camera=world2camera*parent_iter->parent2local();
-		parent_iter=parent_iter->parent();
-	}
-
 	vector<RenderRequest> render_q;
-	entity_root->draw(world2camera, render_q);
+	entity_root->draw(camera->world2local(), render_q);
 	renderer->render(render_q);
 }
 
