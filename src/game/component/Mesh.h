@@ -35,7 +35,7 @@ struct BoneInfluence{
 	float weight=0;
 	Bone* bone=nullptr;
 };
-const int MAX_BONE_INFLUENCE=8;
+const int MAX_BONE_INFLUENCE=4;
 
 class Mesh:public Component{
 public:

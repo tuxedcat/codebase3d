@@ -41,12 +41,12 @@ public:
 	Vec3 position()const{ return _position; }
 	Quaternion rotate()const{ return _rotate; }
 	Vec3 scale()const{ return _scale; }
-	void position(const Vec3& v){ _position=v; }
-	void rotate(const Quaternion& q){ _rotate=q; }
-	void scale(const Vec3& v){ _scale=v; }
-	void position_acc(const Vec3& v){ _position+=v; }
-	void rotate_acc(Quaternion q){ _rotate=q*_rotate; }
-	void scale_acc(const Vec3& v){ _scale*=v; }
+	void position(const Vec3& v){ _position=v; local2world_dirty=world2local_dirty=true; }
+	void rotate(const Quaternion& q){ _rotate=q; local2world_dirty=world2local_dirty=true; }
+	void scale(const Vec3& v){ _scale=v; local2world_dirty=world2local_dirty=true; }
+	void position_acc(const Vec3& v){ _position+=v; local2world_dirty=world2local_dirty=true; }
+	void rotate_acc(Quaternion q){ _rotate=q*_rotate; local2world_dirty=world2local_dirty=true; }
+	void scale_acc(const Vec3& v){ _scale*=v; local2world_dirty=world2local_dirty=true; }
 
 	Entity* parent()const{return _parent;}
 	void adopt(Entity* child){
@@ -96,24 +96,23 @@ public:
 		};
 		return mscale*mrotate*mposition;
 	}
-
+	mutable bool local2world_dirty=true;
+	mutable Mat44 local2world_memo;
 	Mat44 local2world()const{
-		auto ret=Mat44::identity();
-		auto node=this;
-		while(node){
-			ret=node->local2parent()*ret;
-			node=node->parent();
+		if(local2world_dirty){
+			local2world_memo=_parent?_parent->local2world()*local2parent():local2parent();
+			local2world_dirty=false;
 		}
-		return ret;
+		return local2world_memo;
 	}
+	mutable bool world2local_dirty=true;
+	mutable Mat44 world2local_memo;
 	Mat44 world2local()const{
-		auto ret=Mat44::identity();
-		auto node=this;
-		while(node){
-			ret=ret*node->parent2local();
-			node=node->parent();
+		if(world2local_dirty){
+			world2local_memo=_parent?parent2local()*_parent->world2local():parent2local();
+			world2local_dirty=false;
 		}
-		return ret;
+		return world2local_memo;
 	}
 
 	void draw(const Mat44& world2camera, Mat44 parent2world, std::vector<RenderRequest>& render_q)const;

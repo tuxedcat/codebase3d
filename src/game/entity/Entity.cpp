@@ -143,7 +143,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				int influence_idx=0;
 				while(influence_idx<MAX_BONE_INFLUENCE and mesh->bone_influences[target_vertex][influence_idx].bone)
 					influence_idx++;
-				assert(influence_idx<MAX_BONE_INFLUENCE);
+				assert(influence_idx<=MAX_BONE_INFLUENCE);
 
 				mesh->bone_influences[target_vertex][influence_idx].bone=&bone;
 				mesh->bone_influences[target_vertex][influence_idx].weight=weight;
@@ -211,25 +211,36 @@ void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<Ren
 	}
 
 	for(auto mesh:meshes){
-		vector<Vec3> vertices_cur(mesh->vertices.size()), normals_cur(mesh->vertices.size());
-		for(int i=0;i<mesh->vertices.size();i++){
-			Vec3 vtx_skinned;
-			for(int j=0;j<MAX_BONE_INFLUENCE;j++){
-				if(mesh->bone_influences[i][j].weight!=0)
-					vtx_skinned += mesh->bone_influences[i][j].bone->node->local2world()*mesh->bone_influences[i][j].bone->offset * mesh->vertices[i] * mesh->bone_influences[i][j].weight;
+		if(mesh->bones.size()){
+			vector<Vec3> vertices_cur(mesh->vertices.size()), normals_cur(mesh->vertices.size());
+			for(int i=0;i<mesh->vertices.size();i++){
+				Vec3 vtx_skinned;
+				for(int j=0;j<MAX_BONE_INFLUENCE;j++){
+					if(mesh->bone_influences[i][j].weight!=0)
+						vtx_skinned += mesh->bone_influences[i][j].bone->node->local2world()*mesh->bone_influences[i][j].bone->offset * mesh->vertices[i] * mesh->bone_influences[i][j].weight;
+				}
+				vertices_cur[i]=vtx_skinned;
+				//TODO: normal
+				normals_cur[i]=mesh->normals[i];
 			}
-			vertices_cur[i]=vtx_skinned;
-			//TODO: normal
-			normals_cur[i]=mesh->normals[i];
+			render_q.emplace_back(
+				world2camera,
+				mesh->primitive_type,
+				vertices_cur,
+				normals_cur,
+				mesh->texcoord,
+				mesh->faces,
+				mesh->material->getTextureID());
+		}else{
+			render_q.emplace_back(
+				world2camera*parent2world*local2parent(),
+				mesh->primitive_type,
+				mesh->vertices,
+				mesh->normals,
+				mesh->texcoord,
+				mesh->faces,
+				mesh->material->getTextureID());
 		}
-		render_q.emplace_back(
-			world2camera*local2parent(),
-			mesh->primitive_type,
-			vertices_cur,
-			normals_cur,
-			mesh->texcoord,
-			mesh->faces,
-			mesh->material->getTextureID());
 	}
 	// //bone tree
 	// render_q.emplace_back(
@@ -244,7 +255,7 @@ void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<Ren
 
 void Entity::update(float delta_time){
 	static float elapsed=0.0f;
-	elapsed+=delta_time;
+	elapsed+=delta_time*10;
 	if(anims.size()){
 		
 		if(auto it = upper_bound(anims.back().positions.begin(),anims.back().positions.end(),elapsed,[](float time, const auto& keyframe){
