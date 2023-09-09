@@ -3,8 +3,11 @@
 #include <cmath>
 #include <chrono>
 #include <unistd.h>
-
+#define GLM_FORCE_RADIANS
 #include "GLFW/glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 
 #include "game/entity/Entity.h"
 #include "game/component/Mesh.h"
@@ -65,17 +68,21 @@ void init(){
 	camera = new Entity(entity_root);
 	camera->name="camera";
 	camera->position({0,10,20});
-	camera->rotate({{1,0,0},-PI/8});
+	camera->rotate(glm::angleAxis(-PI/8,glm::vec3{1,0,0}));
 	static bool mouse_pressing=false;
 	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
 		static double prev_x=numeric_limits<double>::quiet_NaN(), prev_y=numeric_limits<double>::quiet_NaN();
 		if(mouse_pressing && isnan(prev_x)==false and isnan(prev_y)==false){
 			float dx = e.x-prev_x;
 			float dy = e.y-prev_y;
-			camera->rotate_acc({Vec3{dy,dx,0},(fabs(dx)+fabs(dy))/100});
+			camera->rotate_acc(glm::angleAxis((fabs(dx)+fabs(dy))/100,glm::vec3{dy,dx,0}));
 		}
 		prev_x=e.x;
 		prev_y=e.y;
+
+		[](glm::quat q){
+			cout<<q.w<<' '<<q.x<<' '<<q.y<<' '<<q.z<<endl;
+		}(camera->rotate());
 	});
 	evt::Manager<evt::MousePress>::addHandler([&](const evt::MousePress& e){
 		if(e.btnType==evt::MouseButtonType::left)
@@ -90,7 +97,7 @@ void init(){
 	dv->scale({0.05, 0.05, 0.05});
 	dv->position({-4,-2,0});
 	dv->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc(Quaternion{{0,1,0},delta_time});
+		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
 	};
 	entity_root->adopt(dv);
 	
@@ -98,26 +105,28 @@ void init(){
 	dv2->scale({0.5, 0.5, 0.5});
 	dv2->position({200,0,0});
 	dv2->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc(Quaternion{{0,1,0},delta_time*4});
+		self->rotate_acc(glm::angleAxis(delta_time*4,glm::vec3{0,1,0}));
 	};
 	dv->adopt(dv2);
-	
-	// auto tcf = Entity::loadFromFile("models/toon-cat-free/model.glb");
-	// tcf->scale({1, 1, 1});
-	// tcf->position({6,-1,0});
-	// tcf->onUpdate=[](Entity*self, float delta_time){
-	// 	int asdf=0;
-	// 	cout<<self->position().x<<' '<<self->position().y<<' '<<self->position().z<<endl;
-	// };
-	// entity_root->adopt(tcf);
 
-	// auto fox = Entity::loadFromFile("models/fox/fox.dae");
-	// fox->scale({0.1, 0.1, 0.1});
-	// fox->rotate(Quaternion{{0, 1, 0},PI});
-	// fox->position({3,3,0});
-	// fox->onUpdate=[](Entity*self, float delta_time){
-	// };
-	// entity_root->adopt(fox);
+	// cout<<glm::quat{PI,glm::vec3{0.4,0.5,0.1}}.w<<endl;
+	
+	auto tcf = Entity::loadFromFile("models/toon-cat-free/model.glb");
+	tcf->scale({1, 1, 1});
+	tcf->position({6,-1,0});
+	tcf->onUpdate=[](Entity*self, float delta_time){
+		int asdf=0;
+		cout<<self->position().x<<' '<<self->position().y<<' '<<self->position().z<<endl;
+	};
+	entity_root->adopt(tcf);
+
+	auto fox = Entity::loadFromFile("models/fox/fox.dae");
+	fox->scale({0.1, 0.1, 0.1});
+	fox->rotate(glm::angleAxis(PI,glm::vec3{0, 1, 0}));
+	fox->position({3,3,0});
+	fox->onUpdate=[](Entity*self, float delta_time){
+	};
+	entity_root->adopt(fox);
 	
 	// auto koume = Entity::loadFromFile("models/koume/koume.fbx");
 	// koume->position({5,5,0});
@@ -129,7 +138,7 @@ void init(){
 
 	auto cube = Entity::loadFromFile("models/cube/cube.obj");
 	cube->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc(Quaternion({0,1,0},delta_time));
+		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
 	};
 	cube->position({14,0,0});
 	entity_root->adopt(cube);

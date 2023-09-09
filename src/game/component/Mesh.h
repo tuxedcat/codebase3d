@@ -6,7 +6,6 @@
 #include <GL/gl.h>
 #include "common/Vec3.h"
 #include "common/Mat44.h"
-#include "common/Quaternion.h"
 #include "game/component/Component.h"
 #include "render/Renderer.h"
 

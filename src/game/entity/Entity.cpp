@@ -5,6 +5,9 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "glm/gtx/matrix_decompose.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 using namespace std;
 
 static Entity* loadFromFileImpl(
@@ -185,7 +188,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 			for(int j=0;j<channel_src->mNumRotationKeys;j++){
 				bone_node->anims.back().rotations.emplace_back(
 					channel_src->mRotationKeys[j].mTime,
-					Quaternion{
+					glm::quat{
 						channel_src->mRotationKeys[j].mValue.w,
 						channel_src->mRotationKeys[j].mValue.x,
 						channel_src->mRotationKeys[j].mValue.y,
@@ -279,7 +282,7 @@ void Entity::update(float delta_time){
 			});it!=anims.back().rotations.begin() and it!=anims.back().rotations.end()){
 			auto [t0,q0] = *prev(it);
 			auto [t1,q1] = *it;
-			rotate(q0.slerp(q1, (fmod(elapsed,anims.back().duration)-t0)/(t1-t0)).normalized());
+			rotate(glm::slerp(q0,q1,(fmod(elapsed,anims.back().duration)-t0)/(t1-t0)));
 		}
 		
 		if(auto it = upper_bound(anims.back().scales.begin(),anims.back().scales.end(),fmod(elapsed,anims.back().duration),[](float time, const auto& keyframe){
