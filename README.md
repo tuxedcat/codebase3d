@@ -7,7 +7,7 @@ A simple game engine codebase from scratch
 
 ## Demo
 ![Demo GIF](https://github.com/tuxedcat/codebase3d/blob/main/demo.gif)  
-Youtube: https://youtu.be/bWEiqYT7ueI
+Youtube: https://youtu.be/h7IX9Xc9XOo
 
 ## Known Issue  
 Memory Leak https://github.com/glfw/glfw/issues/2093

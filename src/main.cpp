@@ -66,8 +66,11 @@ void init(){
 	entity_root= new Entity();
 	camera = new Entity(entity_root);
 	camera->name="camera";
-	camera->position({0,10,20});
+	camera->position({-80,10,20});
 	camera->rotate(glm::angleAxis(-PI/8,glm::vec3{1,0,0}));
+	camera->onUpdate=[](Entity*self, float delta_time){
+		self->position_acc(Vec3(delta_time*8,0,0));
+	};
 	static bool mouse_pressing=false;
 	evt::Manager<evt::MouseMove>::addHandler([&](const evt::MouseMove& e){
 		static double prev_x=numeric_limits<double>::quiet_NaN(), prev_y=numeric_limits<double>::quiet_NaN();
@@ -87,14 +90,37 @@ void init(){
 		if(e.btnType==evt::MouseButtonType::left)
 			mouse_pressing=false;
 	});
+
+	auto cube = Entity::loadFromFile("models/cube/cube.obj");
+	cube->onUpdate=[](Entity*self, float delta_time){
+		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
+	};
+	cube->position({-40,0,0});
+	entity_root->adopt(cube);
 	
 	auto dv = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
 	dv->scale({0.05, 0.05, 0.05});
-	dv->position({-10,-2,0});
+	dv->position({20,-2,0});
 	dv->onUpdate=[](Entity*self, float delta_time){
 		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
 	};
 	entity_root->adopt(dv);
+	
+	auto tcf = Entity::loadFromFile("models/toon-cat-free/model.gltf");
+	tcf->scale({1.5, 1.5, 1.5});
+	tcf->rotate(glm::angleAxis(PI/2,glm::vec3{0, 1, 0}));
+	tcf->position({-20,0,0});
+	tcf->onUpdate=[](Entity*self, float delta_time){
+	};
+	entity_root->adopt(tcf);
+
+	auto fox = Entity::loadFromFile("models/fox/fox.gltf");
+	fox->scale({0.1, 0.1, 0.1});
+	fox->rotate(glm::angleAxis(PI/2,glm::vec3{1, 0, 0}));
+	fox->onUpdate=[](Entity*self, float delta_time){
+		self->rotate_acc(glm::angleAxis(delta_time*2,glm::vec3{0, 1, 0}));
+	};
+	entity_root->adopt(fox);
 	
 	auto dv2 = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
 	dv2->scale({0.5, 0.5, 0.5});
@@ -103,23 +129,6 @@ void init(){
 		self->rotate_acc(glm::angleAxis(delta_time*4,glm::vec3{0,1,0}));
 	};
 	dv->adopt(dv2);
-
-	// cout<<glm::quat{PI,glm::vec3{0.4,0.5,0.1}}.w<<endl;
-	
-	auto tcf = Entity::loadFromFile("models/toon-cat-free/model.gltf");
-	tcf->scale({1.5, 1.5, 1.5});
-	tcf->rotate(glm::angleAxis(PI/4,glm::vec3{0, 1, 0}));
-	tcf->onUpdate=[](Entity*self, float delta_time){
-	};
-	entity_root->adopt(tcf);
-
-	auto fox = Entity::loadFromFile("models/fox/fox.gltf");
-	fox->scale({0.1, 0.1, 0.1});
-	fox->rotate(glm::angleAxis(PI/2,glm::vec3{1, 0, 0}));
-	fox->position({8,-5,0});
-	fox->onUpdate=[](Entity*self, float delta_time){
-	};
-	entity_root->adopt(fox);
 	
 	// auto koume = Entity::loadFromFile("models/koume/koume.fbx");
 	// koume->position({5,5,0});
@@ -128,13 +137,6 @@ void init(){
 	// 	self->rotate_acc({{0,1,0}, delta_time});
 	// };
 	// entity_root->adopt(koume);
-
-	auto cube = Entity::loadFromFile("models/cube/cube.obj");
-	cube->onUpdate=[](Entity*self, float delta_time){
-		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
-	};
-	cube->position({14,0,0});
-	entity_root->adopt(cube);
 
 	// auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
 	// backpack->position({5,0,0});
