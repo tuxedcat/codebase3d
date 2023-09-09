@@ -16,8 +16,8 @@ Quaternion::Quaternion(const Mat44& mat):
 //https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
 //https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Conversion_to_and_from_the_matrix_representation
 Mat44 Quaternion::toRotationMatrix()const{
-	if(!isUnit())
-		std::cerr << "[WARNING]: Quaternion::isUnit() Failed" << std::endl;
+	// if(!isUnit())
+	// 	std::cerr << "[WARNING]: Quaternion::isUnit() Failed" << std::endl;
 	float s=1/lensq();
 	return {
 		1-2*s*(y*y+z*z), 2*s*(x*y-z*w), 2*s*(x*z+y*w), 0,

@@ -88,10 +88,36 @@ void init(){
 	
 	auto dv = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
 	dv->scale({0.05, 0.05, 0.05});
-	dv->position({-6,-1,0});
+	dv->position({-4,-2,0});
 	dv->onUpdate=[](Entity*self, float delta_time){
+		self->rotate_acc(Quaternion{{0,1,0},delta_time});
 	};
 	entity_root->adopt(dv);
+	
+	auto dv2 = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
+	dv2->scale({0.5, 0.5, 0.5});
+	dv2->position({200,0,0});
+	dv2->onUpdate=[](Entity*self, float delta_time){
+		self->rotate_acc(Quaternion{{0,1,0},delta_time*4});
+	};
+	dv->adopt(dv2);
+	
+	// auto tcf = Entity::loadFromFile("models/toon-cat-free/model.glb");
+	// tcf->scale({1, 1, 1});
+	// tcf->position({6,-1,0});
+	// tcf->onUpdate=[](Entity*self, float delta_time){
+	// 	int asdf=0;
+	// 	cout<<self->position().x<<' '<<self->position().y<<' '<<self->position().z<<endl;
+	// };
+	// entity_root->adopt(tcf);
+
+	// auto fox = Entity::loadFromFile("models/fox/fox.dae");
+	// fox->scale({0.1, 0.1, 0.1});
+	// fox->rotate(Quaternion{{0, 1, 0},PI});
+	// fox->position({3,3,0});
+	// fox->onUpdate=[](Entity*self, float delta_time){
+	// };
+	// entity_root->adopt(fox);
 	
 	// auto koume = Entity::loadFromFile("models/koume/koume.fbx");
 	// koume->position({5,5,0});
@@ -105,7 +131,7 @@ void init(){
 	cube->onUpdate=[](Entity*self, float delta_time){
 		self->rotate_acc(Quaternion({0,1,0},delta_time));
 	};
-	cube->position({3,0,0});
+	cube->position({14,0,0});
 	entity_root->adopt(cube);
 
 	// auto backpack = Entity::loadFromFile("models/backpack/backpack.obj");
@@ -131,11 +157,11 @@ void update(){
 	evt::Manager<evt::MouseRelease>::patchEvents();
 	entity_root->update(delta_time);
 	prev_time = cur_time;
-	std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
+	// std::cout<<"FPS: "<<int(1/delta_time)<<std::endl;
 }
 
 int main(){
-	try{
+	// try{
 		init();
 		while(!glfwWindowShouldClose(window)){
 			update();
@@ -149,13 +175,13 @@ int main(){
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
-	}catch(const char* err){
-		cout<<"Unhandled exception(const char*): "<<err<<endl;
-		throw err;
-	}catch(const string& err){
-		cout<<"Unhandled exception(string): "<<err<<endl;
-		throw err;
-	}
+	// }catch(const char* err){
+	// 	cout<<"Unhandled exception(const char*): "<<err<<endl;
+	// 	throw err;
+	// }catch(const string& err){
+	// 	cout<<"Unhandled exception(string): "<<err<<endl;
+	// 	throw err;
+	// }
 	glfwTerminate();
 	return 0;
 }

@@ -49,6 +49,7 @@ static Entity* loadFromFileImpl(
 		ret->addMesh(meshes[node->mMeshes[idx_mesh]]);
 	};
 	assert(!mapping.contains(node->mName.C_Str()));
+	cout<<ret->name<<endl;
 	return mapping[node->mName.C_Str()]=ret;
 }
 
@@ -149,23 +150,30 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				mesh->bone_influences[target_vertex][influence_idx].weight=weight;
 			}
 			name2bone[bone.name]=&bone;
+			cout<<"Bone:"<<bone.name<<endl;
 		}
 	}
 
 	auto ret = loadFromFileImpl(scene->mRootNode, meshes, name2bonenode);
+	
+	// Copy animation info
 	if(scene->mAnimations){
 		const auto& anim_src=scene->mAnimations[0];
 		for(int i=0;i<anim_src->mNumChannels;i++){
 			const auto& channel_src=anim_src->mChannels[i];
-			auto& bone = name2bonenode[channel_src->mNodeName.C_Str()];
-			name2bone[bone->name]->node=bone;
-			bone->anims.emplace_back(
+			auto& bone_node = name2bonenode[channel_src->mNodeName.C_Str()];
+			if(!bone_node or !name2bone.contains(bone_node->name)){
+				std::cerr << "WARNING: bone_node not found" << std::endl;
+				continue;
+			}
+			name2bone[bone_node->name]->node=bone_node;
+			bone_node->anims.emplace_back(
 				string(anim_src->mName.C_Str()),
 				float(anim_src->mDuration),
 				float(anim_src->mTicksPerSecond)
 			);
 			for(int j=0;j<channel_src->mNumPositionKeys;j++){
-				bone->anims.back().positions.emplace_back(
+				bone_node->anims.back().positions.emplace_back(
 					channel_src->mPositionKeys[j].mTime,
 					Vec3{
 						channel_src->mPositionKeys[j].mValue.x,
@@ -175,7 +183,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				);
 			}
 			for(int j=0;j<channel_src->mNumRotationKeys;j++){
-				bone->anims.back().rotations.emplace_back(
+				bone_node->anims.back().rotations.emplace_back(
 					channel_src->mRotationKeys[j].mTime,
 					Quaternion{
 						channel_src->mRotationKeys[j].mValue.w,
@@ -186,7 +194,7 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				);
 			}
 			for(int j=0;j<channel_src->mNumScalingKeys;j++){
-				bone->anims.back().scales.emplace_back(
+				bone_node->anims.back().scales.emplace_back(
 					channel_src->mScalingKeys[j].mTime,
 					Vec3{
 						channel_src->mScalingKeys[j].mValue.x,
@@ -242,15 +250,15 @@ void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<Ren
 				mesh->material->getTextureID());
 		}
 	}
-	// //bone tree
-	// render_q.emplace_back(
-	// 	world2camera*parent2world,
-	// 	PrimitiveType::lines,
-	// 	std::vector<Vec3>{{0,0,0},position()},
-	// 	std::vector<Vec3>{},
-	// 	std::vector<Vec3>{},
-	// 	std::vector<std::vector<uint>>{},
-	// 	unsigned(-1));
+	//bone tree
+	render_q.emplace_back(
+		world2camera*parent2world,
+		PrimitiveType::lines,
+		std::vector<Vec3>{{0,0,0},position()},
+		std::vector<Vec3>{},
+		std::vector<Vec3>{},
+		std::vector<std::vector<uint>>{},
+		unsigned(-1));
 }
 
 void Entity::update(float delta_time){
@@ -258,28 +266,28 @@ void Entity::update(float delta_time){
 	elapsed+=delta_time*10;
 	if(anims.size()){
 		
-		if(auto it = upper_bound(anims.back().positions.begin(),anims.back().positions.end(),elapsed,[](float time, const auto& keyframe){
+		if(auto it = upper_bound(anims.back().positions.begin(),anims.back().positions.end(),fmod(elapsed,anims.back().duration),[](float time, const auto& keyframe){
 				return time < keyframe.first;
 			});it!=anims.back().positions.begin() and it!=anims.back().positions.end()){
 			auto [t0,v0] = *prev(it);
 			auto [t1,v1] = *it;
-			position(v0.lerp(v1, (elapsed-t0)/(t1-t0)));
+			position(v0.lerp(v1, (fmod(elapsed,anims.back().duration)-t0)/(t1-t0)));
 		}
 		
-		if(auto it = upper_bound(anims.back().rotations.begin(),anims.back().rotations.end(),elapsed,[](float time, const auto& keyframe){
+		if(auto it = upper_bound(anims.back().rotations.begin(),anims.back().rotations.end(),fmod(elapsed,anims.back().duration),[](float time, const auto& keyframe){
 				return time < keyframe.first;
 			});it!=anims.back().rotations.begin() and it!=anims.back().rotations.end()){
 			auto [t0,q0] = *prev(it);
 			auto [t1,q1] = *it;
-			rotate(q0.slerp(q1, (elapsed-t0)/(t1-t0)).normalized());
+			rotate(q0.slerp(q1, (fmod(elapsed,anims.back().duration)-t0)/(t1-t0)).normalized());
 		}
 		
-		if(auto it = upper_bound(anims.back().scales.begin(),anims.back().scales.end(),elapsed,[](float time, const auto& keyframe){
+		if(auto it = upper_bound(anims.back().scales.begin(),anims.back().scales.end(),fmod(elapsed,anims.back().duration),[](float time, const auto& keyframe){
 				return time < keyframe.first;
 			});it!=anims.back().scales.begin() and it!=anims.back().scales.end()){
 			auto [t0,v0] = *prev(it);
 			auto [t1,v1] = *it;
-			scale(v0.lerp(v1, (elapsed-t0)/(t1-t0)));
+			scale(v0.lerp(v1, (fmod(elapsed,anims.back().duration)-t0)/(t1-t0)));
 		}
 	}
 
