@@ -6,7 +6,7 @@ A simple game engine codebase from scratch
 * radian angle
 
 ## Demo
-![Demo GIF](https://raw.githubusercontent.com/tuxedcat/codebase3d/main/demo.gif)
+![Demo GIF](https://github.com/tuxedcat/codebase3d/blob/main/demo.gif)  
 Youtube: https://youtu.be/bWEiqYT7ueI
 
 ## Known Issue  
