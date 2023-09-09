@@ -3,7 +3,6 @@
 #include <cmath>
 #include <chrono>
 #include <unistd.h>
-#define GLM_FORCE_RADIANS
 #include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -79,10 +78,6 @@ void init(){
 		}
 		prev_x=e.x;
 		prev_y=e.y;
-
-		[](glm::quat q){
-			cout<<q.w<<' '<<q.x<<' '<<q.y<<' '<<q.z<<endl;
-		}(camera->rotate());
 	});
 	evt::Manager<evt::MousePress>::addHandler([&](const evt::MousePress& e){
 		if(e.btnType==evt::MouseButtonType::left)
@@ -95,7 +90,7 @@ void init(){
 	
 	auto dv = Entity::loadFromFile("models/dancing_vampire/dancing_vampire.dae");
 	dv->scale({0.05, 0.05, 0.05});
-	dv->position({-4,-2,0});
+	dv->position({-10,-2,0});
 	dv->onUpdate=[](Entity*self, float delta_time){
 		self->rotate_acc(glm::angleAxis(delta_time,glm::vec3{0,1,0}));
 	};
@@ -111,19 +106,17 @@ void init(){
 
 	// cout<<glm::quat{PI,glm::vec3{0.4,0.5,0.1}}.w<<endl;
 	
-	auto tcf = Entity::loadFromFile("models/toon-cat-free/model.glb");
-	tcf->scale({1, 1, 1});
-	tcf->position({6,-1,0});
+	auto tcf = Entity::loadFromFile("models/toon-cat-free/model.gltf");
+	tcf->scale({1.5, 1.5, 1.5});
+	tcf->rotate(glm::angleAxis(PI/4,glm::vec3{0, 1, 0}));
 	tcf->onUpdate=[](Entity*self, float delta_time){
-		int asdf=0;
-		cout<<self->position().x<<' '<<self->position().y<<' '<<self->position().z<<endl;
 	};
 	entity_root->adopt(tcf);
 
-	auto fox = Entity::loadFromFile("models/fox/fox.dae");
+	auto fox = Entity::loadFromFile("models/fox/fox.gltf");
 	fox->scale({0.1, 0.1, 0.1});
-	fox->rotate(glm::angleAxis(PI,glm::vec3{0, 1, 0}));
-	fox->position({3,3,0});
+	fox->rotate(glm::angleAxis(PI/2,glm::vec3{1, 0, 0}));
+	fox->position({8,-5,0});
 	fox->onUpdate=[](Entity*self, float delta_time){
 	};
 	entity_root->adopt(fox);

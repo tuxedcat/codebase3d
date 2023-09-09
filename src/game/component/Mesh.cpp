@@ -7,6 +7,7 @@
 using namespace std;
 
 Material::Material(const std::string& texture_path){
+	std::cout<<texture_path<<std::endl;
 	int width, height, channels;
 	auto path = string(texture_path);
 	std::replace(path.begin(), path.end(), '\\', '/');
@@ -14,9 +15,9 @@ Material::Material(const std::string& texture_path){
 	if(!image)
 		throw stbi_failure_reason();
 	if(width!=height)
-		throw "Non square images are not supported.";
+		throw "Non square images are not supported. or call glPixelStorei(GL_UNPACK_ALIGNMENT, 1);";
 	if(popcount<unsigned>(width)!=1)
-		throw "Non power of 2 sizes are not supported.";
+		throw "Non power of 2 sizes are not supported. or call glPixelStorei(GL_UNPACK_ALIGNMENT, 1);";
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -24,7 +25,8 @@ Material::Material(const std::string& texture_path){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	stbi_image_free(image);
+	// glBindTexture(GL_TEXTURE_2D, 0);
+	// stbi_image_free(image);
 }
 Material::~Material(){
 	glDeleteTextures(1, &textureID);

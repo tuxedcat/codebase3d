@@ -52,7 +52,6 @@ static Entity* loadFromFileImpl(
 		ret->addMesh(meshes[node->mMeshes[idx_mesh]]);
 	};
 	assert(!mapping.contains(node->mName.C_Str()));
-	cout<<ret->name<<endl;
 	return mapping[node->mName.C_Str()]=ret;
 }
 
@@ -153,7 +152,6 @@ Entity* Entity::loadFromFile(const std::string& model_path){
 				mesh->bone_influences[target_vertex][influence_idx].weight=weight;
 			}
 			name2bone[bone.name]=&bone;
-			cout<<"Bone:"<<bone.name<<endl;
 		}
 	}
 
@@ -221,6 +219,7 @@ void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<Ren
 		i->draw(world2camera, parent2world*local2parent(), render_q);
 	}
 
+	// Draw meshes
 	for(auto mesh:meshes){
 		if(mesh->bones.size()){
 			vector<Vec3> vertices_cur(mesh->vertices.size()), normals_cur(mesh->vertices.size());
@@ -253,15 +252,16 @@ void Entity::draw(const Mat44& world2camera, Mat44 parent2world, std::vector<Ren
 				mesh->material->getTextureID());
 		}
 	}
-	//bone tree
-	render_q.emplace_back(
-		world2camera*parent2world,
-		PrimitiveType::lines,
-		std::vector<Vec3>{{0,0,0},position()},
-		std::vector<Vec3>{},
-		std::vector<Vec3>{},
-		std::vector<std::vector<uint>>{},
-		unsigned(-1));
+
+	// // Draw bone tree
+	// render_q.emplace_back(
+	// 	world2camera*parent2world,
+	// 	PrimitiveType::lines,
+	// 	std::vector<Vec3>{{0,0,0},position()},
+	// 	std::vector<Vec3>{},
+	// 	std::vector<Vec3>{},
+	// 	std::vector<std::vector<uint>>{},
+	// 	unsigned(-1));
 }
 
 void Entity::update(float delta_time){

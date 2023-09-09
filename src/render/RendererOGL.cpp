@@ -20,6 +20,8 @@ RendererOGL::RendererOGL(){
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	
+	glEnable(GL_TEXTURE_2D);
 }
 
 GLenum PrimitiveType2GL(PrimitiveType prim_type){
@@ -48,19 +50,18 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	GLfloat ambientLight[] = { 0.8f, 0.8f, 0.8f, 1.0f }; 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight); 
-	
-	glEnable(GL_TEXTURE_2D);
 
 	for(const auto&req:render_q){
 		glLoadMatrixf((const float*)req.to_world.transposed().a);
+		if(req.textureID!=-1){
+			glBindTexture(GL_TEXTURE_2D, req.textureID);
+		}
 		glBegin(PrimitiveType2GL(req.primitive_type));
 		if(req.primitive_type==PrimitiveType::lines){
 			glColor3bv((GLbyte*)&req.textureID);
 			for(auto vtx:req.vertices)
 				glVertex3f(vtx.x,vtx.y,vtx.z);
 		}else{
-			if(req.textureID!=-1)
-				glBindTexture(GL_TEXTURE_2D, req.textureID);
 			for(auto face:req.faces){
 				for(auto i:face){
 					if(req.textureID!=-1)
@@ -72,8 +73,6 @@ void RendererOGL::render(const std::vector<RenderRequest>& render_q){
 		}
 		glEnd();
 	}
-
-	glDisable(GL_TEXTURE_2D);
 }
 
 //https://www.khronos.org/opengl/wiki/GluPerspective_code
